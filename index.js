@@ -10,10 +10,6 @@
  * This version also drops support for platforms that don't provide `Uint8Array` and `DataView` (use a polyfill instead).
  */
 
-/** 
- * @typedef {Int8Array|Uint8Array|Uint8ClampedArray|Int16Array|Uint16Array|Int32Array|Uint32Array|Float32Array|Float64Array|BigInt64Array|BigUint64Array} TypedArray
- */
-
 const b64lookup = []
 const urlLookup = []
 const revLookup = []
@@ -21,7 +17,7 @@ const revLookup = []
 const SAME     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 const CODE_B64 = SAME + '+/'
 const CODE_URL = SAME + '-_'
-const PAD      = '='
+const PAD_B64  = '='
 const PAD_URL  = '~'
 
 const MAX_CHUNK_LENGTH = 16383 // must be multiple of 3
@@ -46,7 +42,7 @@ function getLens (b64) {
 
   // Trim off extra bytes after placeholder bytes are found
   // See: https://github.com/beatgammit/base64-js/issues/42
-  let validLen = b64.indexOf(PAD)
+  let validLen = b64.indexOf(PAD_B64)
   if (validLen === -1) validLen = b64.indexOf(PAD_URL)
   if (validLen === -1) validLen = len
 
@@ -58,12 +54,12 @@ function getLens (b64) {
 }
 
 // base64 is 4/3 + up to two characters of the original data
-export function byteLength (b64) {
+export function byteLength(b64) {
   const [validLen, placeHoldersLen] = getLens(b64)
   return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
 
-function _byteLength (validLen, placeHoldersLen) {
+function _byteLength(validLen, placeHoldersLen) {
   return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
 
@@ -78,7 +74,7 @@ function _byteLength (validLen, placeHoldersLen) {
  * @param {string} b64 A Base64 string in either regular or URL-friendly representation
  * @returns {ArrayBuffer} The binary data as an `ArrayBuffer`.
  */
-export function toByteArray (b64) {
+export function toByteArray(b64) {
   let tmp
   const [validLen, placeHoldersLen] = getLens(b64)
 
@@ -150,14 +146,14 @@ function encodeChunk (lookup, view, start, end) {
  * @param {boolean} [urlFriendly] Set to true to encode in a URL-friendly way.
  * @returns {string} The contents of `typedArray` as a Base64 string.
  */
-export function fromByteArray (arrayBuffer, urlFriendly = false) {
+export function fromByteArray(arrayBuffer, urlFriendly = false) {
   let tmp
   const view = new DataView(arrayBuffer)
   const len = view.byteLength;
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
   const parts = []
   const lookup = urlFriendly ? urlLookup : b64lookup;
-  const pad = urlFriendly ? PAD_URL : PAD
+  const pad = urlFriendly ? PAD_URL : PAD_B64
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (let i = 0, len2 = len - extraBytes; i < len2; i += MAX_CHUNK_LENGTH) {
