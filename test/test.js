@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
 
-import { toByteArray, fromByteArray } from '../web-base64.js';
+import { toByteArray, fromByteArray } from '../index.js';
 
 const encode = str => new TextEncoder().encode(str).buffer;
 

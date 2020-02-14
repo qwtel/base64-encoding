@@ -2,12 +2,12 @@
   "name": "web-base64",
   "version": "1.0.0",
   "description": "Slightly modernized version of base64-js",
-  "main": "web-base64.cjs",
+  "main": "index.cjs",
   "type": "module",
   "exports": {
     ".": {
-      "import": "./web-base64.js",
-      "require": "./web-base64.cjs"
+      "import": "./index.js",
+      "require": "./index.cjs"
     }
   },
   "scripts": {

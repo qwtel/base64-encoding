@@ -22,7 +22,7 @@ export async function commonjsify(fileName) {
 }
 
 ;(async () => {
-  for (const f of ['web-base64.js']) {
+  for (const f of ['index.js']) {
     const base = path.basename(f, '.js');
     const dest = path.resolve(`${base}.cjs`)
     await fs.promises.writeFile(dest, await commonjsify(path.resolve(f)), 'utf-8');

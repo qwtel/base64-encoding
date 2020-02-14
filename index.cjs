@@ -20,7 +20,7 @@ const b64lookup = []
 const urlLookup = []
 const revLookup = []
 
-const SAME = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+const SAME     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 const CODE_B64 = SAME + '+/'
 const CODE_URL = SAME + '-_'
 const PAD      = '='
@@ -48,7 +48,8 @@ function getLens (b64) {
 
   // Trim off extra bytes after placeholder bytes are found
   // See: https://github.com/beatgammit/base64-js/issues/42
-  let validLen = b64.indexOf(PAD) || b64.indexOf(PAD_URL);
+  let validLen = b64.indexOf(PAD)
+  if (validLen === -1) validLen = b64.indexOf(PAD_URL)
   if (validLen === -1) validLen = len
 
   const placeHoldersLen = validLen === len
@@ -158,7 +159,7 @@ module.exports.fromByteArray = function fromByteArray (arrayBuffer, urlFriendly 
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
   const parts = []
   const lookup = urlFriendly ? urlLookup : b64lookup;
-  const pad = urlFriendly ? '~' : '='
+  const pad = urlFriendly ? PAD_URL : PAD
 
   // go through the array every three bytes, we'll deal with trailing stuff later
   for (let i = 0, len2 = len - extraBytes; i < len2; i += MAX_CHUNK_LENGTH) {
