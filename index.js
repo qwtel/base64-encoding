@@ -1,5 +1,3 @@
-'use strict'
-
 /**
  * Slightly modernized version of [`base64-js`](https://github.com/beatgammit/base64-js). 
  * Performance should be close to the same.
