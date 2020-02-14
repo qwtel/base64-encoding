@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Slightly modernized version of base64-js",
   "main": "index.cjs",
+  "module": "index.js",
   "type": "module",
   "exports": {
     ".": {
