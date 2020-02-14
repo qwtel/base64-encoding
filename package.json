@@ -1,0 +1,27 @@
+{
+  "name": "web-base64",
+  "version": "1.0.0",
+  "description": "Slightly modernized version of base64-js",
+  "main": "web-base64.cjs",
+  "type": "module",
+  "exports": {
+    ".": {
+      "import": "./web-base64.js",
+      "require": "./web-base64.cjs"
+    }
+  },
+  "scripts": {
+    "test": "node test/test.js",
+    "build": "node scripts/build.js"
+  },
+  "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
+  "license": "MIT",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qwtel/web-base64.git"
+  },
+  "homepage": "https://github.com/qwtel/web-base64#readme"
+}
