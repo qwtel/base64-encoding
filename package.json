@@ -17,6 +17,7 @@
   },
   "scripts": {
     "test": "node test/test.js",
+    "bench": "node test/benchmark.js",
     "build": "node scripts/build.js"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
@@ -28,5 +29,8 @@
     "type": "git",
     "url": "git+https://github.com/qwtel/web-base64.git"
   },
-  "homepage": "https://github.com/qwtel/web-base64#readme"
+  "homepage": "https://github.com/qwtel/web-base64#readme",
+  "devDependencies": {
+    "base64-js": "^1.3.1"
+  }
 }
