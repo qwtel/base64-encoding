@@ -129,13 +129,13 @@ function tripletToBase64 (lookup, num) {
 
 function encodeChunk (lookup, view, start, end) {
   let tmp
-  const output = []
-  for (let i = start; i < end; i += 3) {
+  const output = new Array((end - start) / 3)
+  for (let i = start, j = 0; i < end; i += 3, j++) {
     tmp =
       ((view.getUint8(i    ) << 16) & 0xff0000) +
       ((view.getUint8(i + 1) <<  8) & 0x00ff00) +
       ( view.getUint8(i + 2)        & 0x0000ff)
-    output.push(tripletToBase64(lookup, tmp))
+    output[j] = tripletToBase64(lookup, tmp);
   }
   return output.join('')
 }
@@ -147,35 +147,36 @@ function encodeChunk (lookup, view, start, end) {
  * @returns {string} The contents of `typedArray` as a Base64 string.
  */
 export function fromByteArray(arrayBuffer, urlFriendly = false) {
-  let tmp
   const view = new DataView(arrayBuffer)
   const len = view.byteLength;
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
-  const parts = []
+  const len2 = len - extraBytes
+  const parts = new Array(Math.floor(len2 / MAX_CHUNK_LENGTH) + Math.sign(extraBytes))
   const lookup = urlFriendly ? urlLookup : b64lookup;
   const pad = urlFriendly ? PAD_URL : PAD_B64
 
   // go through the array every three bytes, we'll deal with trailing stuff later
-  for (let i = 0, len2 = len - extraBytes; i < len2; i += MAX_CHUNK_LENGTH) {
-    parts.push(encodeChunk(
+  let j = 0
+  for (let i = 0; i < len2; i += MAX_CHUNK_LENGTH) {
+    parts[j++] = encodeChunk(
       lookup,
       view, 
       i, 
       (i + MAX_CHUNK_LENGTH) > len2 ? len2 : (i + MAX_CHUNK_LENGTH),
-    ))
+    )
   }
 
   // pad the end with zeros, but make sure to not forget the extra bytes
   if (extraBytes === 1) {
-    tmp = view.getUint8(len - 1);
-    parts.push(
+    let tmp = view.getUint8(len - 1);
+    parts[j] = (
       lookup[ tmp >>  2]         +
       lookup[(tmp <<  4) & 0x3f] +
       pad + pad
     )
   } else if (extraBytes === 2) {
-    tmp = (view.getUint8(len - 2) << 8) + view.getUint8(len - 1)
-    parts.push(
+    let tmp = (view.getUint8(len - 2) << 8) + view.getUint8(len - 1)
+    parts[j] = (
       lookup[ tmp >> 10]         +
       lookup[(tmp >>  4) & 0x3f] +
       lookup[(tmp <<  2) & 0x3f] +
