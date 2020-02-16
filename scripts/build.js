@@ -12,7 +12,7 @@ const RE = [
   [/export[^\S]*(async[^\S]*)?(class|function)(\*)?[^\S]+(\w+)/gu, 'module.exports.$4 = $1$2$3 $4'],
   [/export[^\S]*(const|let|var)[^\S]+(\w+)/gu, '$1 $2 = module.exports.$2'],
   [/export[^\S]*\{([^}]*)\}/gu, 'Object.assign(module.exports, {$1});'],
-  [/([^\s*]+) as ([^\s]+)/gu, '$1: $2'], // taking care of all the `something as somethingElse`.
+  // [/([^\s*]+) as ([^\s]+)/gu, '$1: $2'], // taking care of all the `something as somethingElse`.
 ];
 
 export async function commonjsify(fileName) {

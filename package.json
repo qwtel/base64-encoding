@@ -18,7 +18,8 @@
   "scripts": {
     "test": "node test/test.js",
     "bench": "node test/benchmark.js",
-    "build": "node scripts/build.js"
+    "build": "node scripts/build.js",
+    "prepack": "npm run build && npm run build"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
   "license": "MIT",
