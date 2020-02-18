@@ -64,8 +64,8 @@ function _byteLength(validLen, placeHoldersLen) {
 }
 
 /**
- * Takes a base 64 string and converts it to `Uint8Array`.
- * Accepts both regualar Base64 and the URL-friendly variant,
+ * Takes a base 64 string and converts it to an array buffer.
+ * Accepts both regular Base64 and the URL-friendly variant,
  * where
  * - `+` => `-`,
  * - `/` => `_` and
@@ -141,14 +141,14 @@ function encodeChunk (lookup, view, start, end) {
 }
 
 /**
- * 
- * @param {ArrayBuffer} arrayBuffer 
+ * Encodes binary data provided in an array buffer as a Base64 string.
+ * @param {BufferSource} bufferSource The raw data to encode.
  * @param {boolean} [urlFriendly] Set to true to encode in a URL-friendly way.
- * @returns {string} The contents of `typedArray` as a Base64 string.
+ * @returns {string} The contents a Base64 string.
  */
-export function fromByteArray(arrayBuffer, urlFriendly = false) {
-  const view = new DataView(arrayBuffer)
-  const len = view.byteLength;
+export function fromByteArray(bufferSource, urlFriendly = false) {
+  const view = new DataView(bufferSource.buffer || bufferSource)
+  const len = view.byteLength
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
   const len2 = len - extraBytes
   const parts = new Array(Math.floor(len2 / MAX_CHUNK_LENGTH) + Math.sign(extraBytes))
