@@ -5,38 +5,49 @@
 import fs from 'fs';
 import path from 'path';
 
-import base64 from 'base64-js'
+import base64JS from 'base64-js'
 
 import { fromByteArray as fromByteArraySwitch } from './base64-switch.js'
 import { fromByteArray as fromByteArrayMap } from './base64-map.js'
 import { fromByteArray as fromByteArrayMath } from './base64-math.js'
-import { fromByteArray } from '../index.js'
+import { encode } from '../index.js'
+import { WebAssemblyBase64 } from '../c/apache/base64.js';
 
 ;(async () => {
 
 const mobyDick = await fs.promises.readFile(path.resolve('test/mobydick.txt'));
 
 const N = 10000
+const P = 26
 
-console.time('with obj')
-for (let i = 0; i < N; i++) fromByteArray(mobyDick.buffer)
-console.timeEnd('with obj')
+console.time('WebAssemblyBase64'.padEnd(P))
+const base64 = await new WebAssemblyBase64().initialized
+for (let i = 0; i < N; i++) base64.encode(mobyDick.buffer)
+console.timeEnd('WebAssemblyBase64'.padEnd(P))
 
+console.time('WebAssemblyBase64.promises'.padEnd(P))
+for (let i = 0; i < N; i++) await base64.promises.encode(mobyDick.buffer)
+console.timeEnd('WebAssemblyBase64.promises'.padEnd(P))
+
+console.time('base64-js'.padEnd(P))
 const uint8 = new Uint8Array(mobyDick.buffer)
-console.time('original')
-for (let i = 0; i < N; i++) base64.fromByteArray(uint8);
-console.timeEnd('original')
+for (let i = 0; i < N; i++) base64JS.fromByteArray(uint8)
+console.timeEnd('base64-js'.padEnd(P))
 
-console.time('with math')
+console.time('web-base64'.padEnd(P))
+for (let i = 0; i < N; i++) encode(mobyDick.buffer)
+console.timeEnd('web-base64'.padEnd(P))
+
+console.time('web-base64/math'.padEnd(P))
 for (let i = 0; i < N; i++) fromByteArrayMath(mobyDick.buffer)
-console.timeEnd('with math')
+console.timeEnd('web-base64/math'.padEnd(P))
 
-console.time('with map')
+console.time('web-base64/map'.padEnd(P))
 for (let i = 0; i < N; i++) fromByteArrayMap(mobyDick.buffer)
-console.timeEnd('with map')
+console.timeEnd('web-base64/map'.padEnd(P))
 
-console.time('with switch')
+console.time('web-base64/switch'.padEnd(P))
 for (let i = 0; i < N; i++) fromByteArraySwitch(mobyDick.buffer)
-console.timeEnd('with switch')
+console.timeEnd('web-base64/switch'.padEnd(P))
 
 })();

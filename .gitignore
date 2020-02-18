@@ -1,3 +1,5 @@
 node_modules
+play.js
+play.html
 *.tgz
 *.cjs
