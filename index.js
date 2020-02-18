@@ -186,3 +186,8 @@ export function fromByteArray(arrayBuffer, urlFriendly = false) {
 
   return parts.join('')
 }
+
+export {
+  fromByteArray as encode,
+  toByteArray as decode,
+}

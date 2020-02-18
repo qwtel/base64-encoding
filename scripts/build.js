@@ -4,20 +4,42 @@
 import fs from 'fs';
 import path from 'path';
 
-const RE = [
+const RULES = [
   [/import[^\S]*(['"]([^'"]*)['"])/gu, 'require($1)'],
   [/import[^\S]*\{([^}]*)\}[^\S]*from[^\S]*(['"]([^'"]*)['"])/gu, 'const {$1} = require($2)'],
   [/import[^\S]*\*[^\S]*as[^\S]*([^\s]*)[^\S]from[^\S](['"]([^'"]*)['"])/gu, 'const $1 = require($2)'],
   [/export[^\S]*\*[^\S]*as[^\S]*([^\s]*)[^\S]from[^\S](['"]([^'"]*)['"])/gu, 'module.exports.$1 = require($2)'],
   [/export[^\S]*(async[^\S]*)?(class|function)(\*)?[^\S]+(\w+)/gu, 'module.exports.$4 = $1$2$3 $4'],
   [/export[^\S]*(const|let|var)[^\S]+(\w+)/gu, '$1 $2 = module.exports.$2'],
-  [/export[^\S]*\{([^}]*)\}/gu, 'Object.assign(module.exports, {$1});'],
-  // [/([^\s*]+) as ([^\s]+)/gu, '$1: $2'], // taking care of all the `something as somethingElse`.
+  [/export[^\S]*\{([^}]*)\}/gu, ['Object.assign(module.exports, {$$});', ',', [
+    [/([^\S]*)(\w+)[^\S]+as[^\S]+(\w+)/u, '$1$3: $2'],
+    [/(.*)/u, '$1'],
+  ]]],
 ];
 
 export async function commonjsify(fileName) {
   let text = await fs.promises.readFile(fileName, 'utf-8');
-  for (const args of RE) text = text.replace(...args);
+
+  for (const [regex, replacer] of RULES) {
+    if (Array.isArray(replacer)) {
+      const [newString, splitter, args2] = replacer;
+      text = text.replace(regex, (_, inner) => {
+        return newString.replace('$$', inner
+          .split(splitter)
+          .map((line) => {
+            for (const [regex2, replacer2] of args2) {
+              line = line.replace(regex2, replacer2)
+            }
+            return line;
+          })
+          .join(splitter)
+        );
+      })
+    } else {
+      text = text.replace(regex, replacer);
+    }
+  }
+
   return text;
 }
 
