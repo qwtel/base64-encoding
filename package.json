@@ -17,7 +17,7 @@
   },
   "scripts": {
     "test": "node test/test.js",
-    "bench": "node test/benchmark.js",
+    "bench": "node bench/node-bench.js",
     "build": "node scripts/build.js",
     "build:wasm": "npm run build:wasm:cpp && npm run build:wasm:b64 && npm run build:wasm:sub",
     "build:wasm:cpp": "clang --target=wasm32 -O3 -flto -nostdlib -Wl,--no-entry -Wl,--export-all -Wl,--lto-O3 -o c/apache/base64.wasm c/apache/base64.c",
