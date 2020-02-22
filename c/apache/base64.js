@@ -64,8 +64,9 @@ function textEncodeIntoMemory(instance, memory, string) {
   const bufCodedLen = string.length;
   ensureMemory(memory, pBufCoded, bufCodedLen);
 
-  const bufCoded = new Uint8Array(instance.exports.memory.buffer, pBufCoded, bufCodedLen);
+  const bufCoded = new Uint8Array(memory.buffer, pBufCoded, bufCodedLen + 1);
   textEncodeInto(bufCoded, string);
+  bufCoded[bufCodedLen] = '\0';
 
   return [pBufCoded, bufCodedLen]
 }
@@ -97,8 +98,9 @@ function writeIntoMemory(instance, memory, arrayBuffer) {
   const stringLen = arrayBuffer.byteLength;
   ensureMemory(memory, pString, stringLen);
 
-  const string = new Uint8Array(memory.buffer, pString, stringLen);
+  const string = new Uint8Array(memory.buffer, pString, stringLen + 1);
   string.set(new Uint8Array(arrayBuffer));
+  string[stringLen] = '\0';
 
   return [pString, stringLen];
 }
