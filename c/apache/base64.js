@@ -218,35 +218,6 @@ class Base64 {
   get promises() { }
 }
 
-// /** 
-//  * We only need a single instance b/c the JS implementation doesn't have state.
-//  * @type {Promises}
-//  */
-// const jsPromises = new class JSPromises extends Promises {
-//   async encode(arrayBuffer) { return encodeJS(arrayBuffer) }
-//   async decode(string) { return decodeJS(string) }
-// };
-
-// class WASMPromises extends Promises {
-//   constructor(p) { super(); this.p = p }
-//   async encode(arrayBuffer) { return encode((await this.p).instance, arrayBuffer) }
-//   async decode(string) { return decode((await this.p).instance, string) }
-// }
-
-export class JavaScriptBase64 extends Base64 {
-  /** @returns {Promise<this>} */
-  get initialized() { return Promise.resolve(this) }
-
-  /** @param {ArrayBuffer} arrayBuffer @returns {string} */
-  encode(arrayBuffer) { return encodeJS(arrayBuffer) }
-
-  /** @param {string} string @returns {ArrayBuffer} */
-  decode(string) { return decodeJS(string) }
-
-  // /** @returns {Promises} */
-  // get promises() { return jsPromises }
-}
-
 // TODO: Replace with #private variables when those ship
 
 /** @type {Map<Base64, Promise<WebAssembly.WebAssemblyInstantiatedSource>>} */
@@ -301,6 +272,50 @@ export class WebAssemblyBase64 extends Base64 {
   // get promises() { 
   //   return _promises.get(this);
   // }
+}
+
+// /** 
+//  * We only need a single instance b/c the JS implementation doesn't have state.
+//  * @type {Promises}
+//  */
+// const jsPromises = new class JSPromises extends Promises {
+//   async encode(arrayBuffer) { return encodeJS(arrayBuffer) }
+//   async decode(string) { return decodeJS(string) }
+// };
+
+// class WASMPromises extends Promises {
+//   constructor(p) { super(); this.p = p }
+//   async encode(arrayBuffer) { return encode((await this.p).instance, arrayBuffer) }
+//   async decode(string) { return decode((await this.p).instance, string) }
+// }
+
+export class JavaScriptBase64 extends Base64 {
+  /** 
+   * @returns {Promise<this>}
+   */
+  get initialized() {
+    return Promise.resolve(this);
+  }
+
+  /** 
+   * @param {ArrayBuffer} arrayBuffer
+   * @param {boolean} urlFriendly
+   * @returns {string}
+   */
+  encode(arrayBuffer) {
+    return encodeJS(arrayBuffer);
+  }
+
+  /** 
+   * @param {string} string
+   * @returns {ArrayBuffer}
+   */
+  decode(string) {
+    return decodeJS(string);
+  }
+
+  // /** @returns {Promises} */
+  // get promises() { return jsPromises }
 }
 
 export {
