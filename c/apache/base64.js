@@ -133,10 +133,11 @@ function encode(instance, arrayBuffer, urlFriendly) {
   return str;
 }
 
-export class WebAssemblyBase64Impl {
+export class WASMImpl {
   async init() {
     const { instance } = await WebAssembly.instantiate(decodeJS(WASM));
     this.instance = instance;
+    return this;
   }
 
   encode(arrayBuffer, urlFriendly) {
@@ -148,9 +149,7 @@ export class WebAssemblyBase64Impl {
   }
 }
 
-export class JavaScriptBase64Impl {
-  async init() {}
-
+export class JSImpl {
   encode(arrayBuffer, urlFriendly) {
     return encodeJS(arrayBuffer, urlFriendly);
   }
@@ -165,18 +164,19 @@ const _initPromise = new WeakMap();
 
 class Base64 {
   constructor() {
-    let impl;
-    if ('WebAssembly' in globalThis) {
-      _impl.set(this, impl = new WebAssemblyBase64Impl());
-    } else if ('Uint8Array' in globalThis && 'DataView' in globalThis) {
-      _impl.set(this, impl = new JavaScriptBase64Impl());
-    } else {
+    if (!'Uint8Array' in globalThis && 'DataView' in globalThis) {
       throw Error(
         'Platform unsupported. Make sure Uint8Array and DataView exist'
       );
     }
 
-    _initPromise.set(this, impl.init());
+    _impl.set(this, new JSImpl());
+
+    if ('WebAssembly' in globalThis) {
+      _initPromise.set(this, new WASMImpl().init().then((impl) => {
+        _impl.set(this, impl);
+      }));
+    } else _initPromise.set(this, Promise.resolve());
   }
 
   /** 
