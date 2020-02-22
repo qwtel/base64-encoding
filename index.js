@@ -1,24 +1,25 @@
 /**
- * Slightly modernized version of [`base64-js`](https://github.com/beatgammit/base64-js). 
+ * Slightly modernized version of [`base64-js`][1]. 
  * Performance should be close to the same.
- * Main difference is the option to generate URL-friendly Base64,
- * where
- * - `+` => `-`,
- * - `/` => `_` and
- * - `=` => `~` (these are unreserved URI characters according to [RFC 3986](https://tools.ietf.org/html/rfc3986#section-2.3))
  * 
- * This version also drops support for platforms that don't provide `Uint8Array` and `DataView` (use a polyfill instead).
+ * This version drops support for platforms that don't provide 
+ * `Uint8Array` and `DataView` (use a polyfill instead).
+ * 
+ * [1]: https://github.com/beatgammit/base64-js
+ * [2]: https://tools.ietf.org/html/rfc3986#section-2.3
  */
 
 const b64lookup = []
 const urlLookup = []
 const revLookup = []
 
-const SAME     = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+const SAME = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 const CODE_B64 = SAME + '+/'
 const CODE_URL = SAME + '-_'
-const PAD_B64  = '='
-const PAD_URL  = '~'
+const PAD_B64 = '='
+const PAD_URL = '~'
+
+
 
 const MAX_CHUNK_LENGTH = 16383 // must be multiple of 3
 
@@ -69,14 +70,18 @@ function _byteLength(validLen, placeHoldersLen) {
  * where
  * - `+` => `-`,
  * - `/` => `_` and
- * - `=` => `~` (these are unreserved URI characters according to [RFC 3986](https://tools.ietf.org/html/rfc3986#section-2.3))
+ * - `=` => `~` (these are unreserved URI characters according to [RFC 3986][2])
  * 
- * @param {string} b64 A Base64 string in either regular or URL-friendly representation
- * @returns {ArrayBuffer} The binary data as an `ArrayBuffer`.
+ * [2]: https://tools.ietf.org/html/rfc3986#section-2.3
+ * 
+ * @param {string} str 
+ *   A Base64 string in either regular or  URL-friendly representation
+ * @returns {ArrayBuffer}
+ *   The binary data as an `ArrayBuffer`.
  */
-export function toByteArray(b64) {
+export function toByteArray(str) {
   let tmp
-  const [validLen, placeHoldersLen] = getLens(b64)
+  const [validLen, placeHoldersLen] = getLens(str)
 
   const arr = new Uint8Array(_byteLength(validLen, placeHoldersLen))
 
@@ -90,10 +95,10 @@ export function toByteArray(b64) {
   let i
   for (i = 0; i < len; i += 4) {
     tmp =
-      (revLookup[b64.charCodeAt(i    )] << 18) |
-      (revLookup[b64.charCodeAt(i + 1)] << 12) |
-      (revLookup[b64.charCodeAt(i + 2)] <<  6) |
-      (revLookup[b64.charCodeAt(i + 3)]      )
+      (revLookup[str.charCodeAt(i    )] << 18) |
+      (revLookup[str.charCodeAt(i + 1)] << 12) |
+      (revLookup[str.charCodeAt(i + 2)] <<  6) |
+      (revLookup[str.charCodeAt(i + 3)]      )
     arr[curByte++] = (tmp >> 16) & 0xff
     arr[curByte++] = (tmp >>  8) & 0xff
     arr[curByte++] = (tmp      ) & 0xff
@@ -101,16 +106,16 @@ export function toByteArray(b64) {
 
   if (placeHoldersLen === 2) {
     tmp =
-      (revLookup[b64.charCodeAt(i    )] <<  2) |
-      (revLookup[b64.charCodeAt(i + 1)] >>  4)
+      (revLookup[str.charCodeAt(i    )] <<  2) |
+      (revLookup[str.charCodeAt(i + 1)] >>  4)
     arr[curByte++] =  tmp        & 0xff
   }
 
   if (placeHoldersLen === 1) {
     tmp =
-      (revLookup[b64.charCodeAt(i    )] << 10) |
-      (revLookup[b64.charCodeAt(i + 1)] <<  4) |
-      (revLookup[b64.charCodeAt(i + 2)] >>  2)
+      (revLookup[str.charCodeAt(i    )] << 10) |
+      (revLookup[str.charCodeAt(i + 1)] <<  4) |
+      (revLookup[str.charCodeAt(i + 2)] >>  2)
     arr[curByte++] = (tmp >>  8) & 0xff
     arr[curByte++] =  tmp        & 0xff
   }
@@ -151,11 +156,14 @@ export function fromByteArray(bufferSource, urlFriendly = false) {
   const len = view.byteLength
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
   const len2 = len - extraBytes
-  const parts = new Array(Math.floor(len2 / MAX_CHUNK_LENGTH) + Math.sign(extraBytes))
+  const parts = new Array(
+    Math.floor(len2 / MAX_CHUNK_LENGTH) + Math.sign(extraBytes)
+  )
   const lookup = urlFriendly ? urlLookup : b64lookup;
   const pad = urlFriendly ? PAD_URL : PAD_B64
 
-  // go through the array every three bytes, we'll deal with trailing stuff later
+  // Go through the array every three bytes, we'll deal with trailing stuff 
+  // later
   let j = 0
   for (let i = 0; i < len2; i += MAX_CHUNK_LENGTH) {
     parts[j++] = encodeChunk(
