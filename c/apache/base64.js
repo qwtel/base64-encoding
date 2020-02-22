@@ -193,29 +193,6 @@ class Base64 {
     const { urlFriendly = false } = options;
     this.urlFriendly = urlFriendly;
   }
-
-  /**
-   * @returns {Promise<Base64>}
-   */
-  get initialized() { }
-
-  /**
-   * @param {ArrayBuffer} arrayBuffer
-   * @param {boolean} urlFriendly
-   * @returns {string}
-   */
-  encode(arrayBuffer, urlFriendly = false) { }
-
-  /**
-   * @param {string} string
-   * @returns {ArrayBuffer}
-   */
-  decode(string) { }
-
-  /**
-   * @returns {Promises}
-   */
-  get promises() { }
 }
 
 // TODO: Replace with #private variables when those ship
@@ -226,9 +203,6 @@ const _instancePromise = new WeakMap();
 /** @type {Map<Base64, WebAssembly.WebAssemblyInstantiatedSource>} */
 const _instance = new WeakMap();
 
-// /** @type {Map<Base64, Promises>} */
-// const _promises = new WeakMap();
-
 export class WebAssemblyBase64 extends Base64 {
   /**
    * @param {{ urlFriendly?: boolean }} [options]
@@ -237,7 +211,6 @@ export class WebAssemblyBase64 extends Base64 {
     super(options);
     const instancePromise = WebAssembly.instantiate(decodeJS(WASM));
     _instancePromise.set(this, instancePromise);
-    // _promises.set(this, new WASMPromises(instancePromise));
   }
 
   /**
@@ -265,29 +238,7 @@ export class WebAssemblyBase64 extends Base64 {
   decode(string) { 
     return decode(_instance.get(this), string);
   }
-
-  // /** 
-  //  * @returns {Promises}
-  //  */
-  // get promises() { 
-  //   return _promises.get(this);
-  // }
 }
-
-// /** 
-//  * We only need a single instance b/c the JS implementation doesn't have state.
-//  * @type {Promises}
-//  */
-// const jsPromises = new class JSPromises extends Promises {
-//   async encode(arrayBuffer) { return encodeJS(arrayBuffer) }
-//   async decode(string) { return decodeJS(string) }
-// };
-
-// class WASMPromises extends Promises {
-//   constructor(p) { super(); this.p = p }
-//   async encode(arrayBuffer) { return encode((await this.p).instance, arrayBuffer) }
-//   async decode(string) { return decode((await this.p).instance, string) }
-// }
 
 export class JavaScriptBase64 extends Base64 {
   /** 
@@ -313,9 +264,6 @@ export class JavaScriptBase64 extends Base64 {
   decode(string) {
     return decodeJS(string);
   }
-
-  // /** @returns {Promises} */
-  // get promises() { return jsPromises }
 }
 
 export {
