@@ -3,6 +3,7 @@ import path from 'path';
 import assert from 'assert';
 
 import { toByteArray, fromByteArray } from '../index.js';
+import { WebAssemblyBase64, JavaScriptBase64 } from '../c/apache/base64.js';
 
 const encode = str => new TextEncoder().encode(str).buffer;
 
@@ -46,5 +47,47 @@ const mobyDick64 = await fs.promises.readFile(path.resolve('test/mobydick.b64'),
 assert.deepEqual(fromByteArray(encode(mobyDick)), mobyDick64);
 assert.deepEqual(fromByteArray(encode(mobyDick), true), mobyDick64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '~'));
 assert.deepEqual(toByteArray(mobyDick64), encode(mobyDick));
+
+let b64 = await new WebAssemblyBase64().initialized;
+
+assert.deepEqual(b64.encode(encode("f"     )), "Zg=="    );
+assert.deepEqual(b64.encode(encode(""      )), ""        );
+assert.deepEqual(b64.encode(encode("fo"    )), "Zm8="    );
+assert.deepEqual(b64.encode(encode("foo"   )), "Zm9v"    );
+assert.deepEqual(b64.encode(encode("foob"  )), "Zm9vYg==");
+assert.deepEqual(b64.encode(encode("fooba" )), "Zm9vYmE=");
+assert.deepEqual(b64.encode(encode("foobar")), "Zm9vYmFy");
+
+assert.deepEqual(b64.decode("Zg=="    ), encode("f"     ));
+assert.deepEqual(b64.decode(""        ), encode(""      ))
+assert.deepEqual(b64.decode("Zm8="    ), encode("fo"    ));
+assert.deepEqual(b64.decode("Zm9v"    ), encode("foo"   ));
+assert.deepEqual(b64.decode("Zm9vYg=="), encode("foob"  ));
+assert.deepEqual(b64.decode("Zm9vYmE="), encode("fooba" ));
+assert.deepEqual(b64.decode("Zm9vYmFy"), encode("foobar"));
+
+assert.deepEqual(b64.encode(encode(mobyDick)), mobyDick64);
+assert.deepEqual(b64.decode(mobyDick64), encode(mobyDick));
+
+b64 = await new JavaScriptBase64().initialized;
+
+assert.deepEqual(b64.encode(encode("f"     )), "Zg=="    );
+assert.deepEqual(b64.encode(encode(""      )), ""        );
+assert.deepEqual(b64.encode(encode("fo"    )), "Zm8="    );
+assert.deepEqual(b64.encode(encode("foo"   )), "Zm9v"    );
+assert.deepEqual(b64.encode(encode("foob"  )), "Zm9vYg==");
+assert.deepEqual(b64.encode(encode("fooba" )), "Zm9vYmE=");
+assert.deepEqual(b64.encode(encode("foobar")), "Zm9vYmFy");
+
+assert.deepEqual(b64.decode("Zg=="    ), encode("f"     ));
+assert.deepEqual(b64.decode(""        ), encode(""      ))
+assert.deepEqual(b64.decode("Zm8="    ), encode("fo"    ));
+assert.deepEqual(b64.decode("Zm9v"    ), encode("foo"   ));
+assert.deepEqual(b64.decode("Zm9vYg=="), encode("foob"  ));
+assert.deepEqual(b64.decode("Zm9vYmE="), encode("fooba" ));
+assert.deepEqual(b64.decode("Zm9vYmFy"), encode("foobar"));
+
+assert.deepEqual(b64.encode(encode(mobyDick)), mobyDick64);
+assert.deepEqual(b64.decode(mobyDick64), encode(mobyDick));
 
 })();
