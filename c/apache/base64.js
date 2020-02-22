@@ -43,11 +43,6 @@ const BYTES_PER_PAGE = 64 * 1024;
 // TODO: Shrink/discard after use?
 // TODO: Encode streaming!?
 
-/** 
- * @param {WebAssembly.Memory} memory
- * @param {number} pointer
- * @param {number} targetLength
- */
 function ensureMemory(memory, pointer, targetLength) {
   const availableMemory = memory.buffer.byteLength - pointer;
   if (availableMemory < targetLength) {
@@ -56,10 +51,6 @@ function ensureMemory(memory, pointer, targetLength) {
   }
 }
 
-/** 
- * @param {Uint8Array} uint8 
- * @param {string} str
- */
 function textEncodeInto(uint8, str) {
   if (typeof TextEncoder !== 'undefined') {
     if ('encodeInto' in TextEncoder.prototype) {
@@ -75,12 +66,6 @@ function textEncodeInto(uint8, str) {
   return uint8;
 }
 
-/** 
- * @param {WebAssembly.Instance} instance
- * @param {WebAssembly.Memory} memory
- * @param {string} str 
- * @returns {[number, number]}
- */
 function textEncodeIntoMemory(instance, memory, str) {
   const pBufCoded = instance.exports.__heap_base.value;
   const bufCodedLen = str.length;
@@ -93,13 +78,8 @@ function textEncodeIntoMemory(instance, memory, str) {
   return [pBufCoded, bufCodedLen]
 }
 
-/**
- * @param {WebAssembly.Instance} instance
- * @param {string} str
- */
 function decode(instance, str) {
-  /** @type {WebAssembly.Memory} */
-  const memory = instance.exports.memory
+  const { memory } = instance.exports;
 
   const [pBufCoded, bufCodedLen] = textEncodeIntoMemory(instance, memory, str);
 
@@ -117,12 +97,6 @@ function decode(instance, str) {
   return new Uint8Array(bufPlain).buffer;
 }
 
-/**
- * @param {WebAssembly.Instance} instance
- * @param {WebAssembly.Memory} memory
- * @param {ArrayBuffer} arrayBuffer 
- * @returns {[number, number]}
- */
 function writeIntoMemory(instance, memory, arrayBuffer) {
   const pString = instance.exports.__heap_base.value;
   const stringLen = arrayBuffer.byteLength;
@@ -135,15 +109,9 @@ function writeIntoMemory(instance, memory, arrayBuffer) {
   return [pString, stringLen];
 }
 
-/**
- * @param {WebAssembly.Instance} instance 
- * @param {ArrayBuffer} arrayBuffer
- * @param {boolean} urlFriendly
- */
 function encode(instance, arrayBuffer, urlFriendly) {
   // console.time('wasm');
-  /** @type {WebAssembly.Memory} */
-  const memory = instance.exports.memory
+  const { memory}  = instance.exports;
 
   const [pString, stringLen] = writeIntoMemory(instance, memory, arrayBuffer);
 
