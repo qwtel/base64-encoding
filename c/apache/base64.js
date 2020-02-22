@@ -52,16 +52,10 @@ function ensureMemory(memory, pointer, targetLength) {
 }
 
 function textEncodeInto(uint8, str) {
-  if (typeof TextEncoder !== 'undefined') {
-    if ('encodeInto' in TextEncoder.prototype) {
-      new TextEncoder().encodeInto(str, uint8)
-    } else {
-      uint8.set(new TextEncoder().encode(str))
-    }
+  if ('encodeInto' in TextEncoder.prototype) {
+    new TextEncoder().encodeInto(str, uint8)
   } else {
-    for (let i = 0; i < bufCodedLen; i++) {
-      uint8[i] = str.charCodeAt(i);
-    }
+    uint8.set(new TextEncoder().encode(str))
   }
   return uint8;
 }
