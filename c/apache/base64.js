@@ -133,115 +133,93 @@ function encode(instance, arrayBuffer, urlFriendly) {
   return str;
 }
 
-// class Promises {
-//   /** 
-//    * Encode foobar
-//    * @param {ArrayBuffer} arrayBuffer @returns {Promise<string>}
-//    */
-//   async encode(arrayBuffer) { }
-
-//   /** 
-//    * Decode foobar
-//    * @param {string} string @returns {Promise<ArrayBuffer>}
-//    */
-//   async decode(string) { }
-// }
-
-class Base64 {
-  /**
-   * @param {{ urlFriendly?: boolean }} [options]
-   */
-  constructor(options = {}) {
-    const { urlFriendly = false } = options;
-    this.urlFriendly = urlFriendly;
-  }
-}
-
-// TODO: Replace with #private variables when those ship
-
-/** @type {Map<Base64, Promise<WebAssembly.WebAssemblyInstantiatedSource>>} */
-const _instancePromise = new WeakMap();
-
-/** @type {Map<Base64, WebAssembly.WebAssemblyInstantiatedSource>} */
-const _instance = new WeakMap();
-
-export class WebAssemblyBase64 extends Base64 {
-  /**
-   * @param {{ urlFriendly?: boolean }} [options]
-   */
-  constructor(options) {
-    super(options);
-    const instancePromise = WebAssembly.instantiate(decodeJS(WASM));
-    _instancePromise.set(this, instancePromise);
+export class WebAssemblyBase64Impl {
+  async init() {
+    const { instance } = await WebAssembly.instantiate(decodeJS(WASM));
+    this.instance = instance;
   }
 
-  /**
-   * @returns {Promise<this>}
-   */
-  get initialized() {
-    return _instancePromise.get(this).then(({ instance }) => {
-      _instance.set(this, instance);
-      return this;
-    });
+  encode(arrayBuffer, urlFriendly) {
+    return encode(this.instance, arrayBuffer, urlFriendly);
   }
 
-  /** 
-   * @param {ArrayBuffer} arrayBuffer 
-   * @returns {string}
-   */
-  encode(arrayBuffer) {
-    return encode(_instance.get(this), arrayBuffer, this.urlFriendly);
-  }
-
-  /** 
-   * @param {string} string 
-   * @returns {ArrayBuffer}
-   */
   decode(string) { 
-    return decode(_instance.get(this), string);
+    return decode(this.instance, string);
   }
 }
 
-export class JavaScriptBase64 extends Base64 {
-  /** 
-   * @returns {Promise<this>}
-   */
-  get initialized() {
-    return Promise.resolve(this);
+export class JavaScriptBase64Impl {
+  async init() {}
+
+  encode(arrayBuffer, urlFriendly) {
+    return encodeJS(arrayBuffer, urlFriendly);
   }
 
-  /** 
-   * @param {ArrayBuffer} arrayBuffer
-   * @param {boolean} urlFriendly
-   * @returns {string}
-   */
-  encode(arrayBuffer) {
-    return encodeJS(arrayBuffer, this.urlFriendly);
-  }
-
-  /** 
-   * @param {string} string
-   * @returns {ArrayBuffer}
-   */
   decode(string) {
     return decodeJS(string);
   }
 }
 
-export {
-  WebAssemblyBase64 as WASMBase64,
-  JavaScriptBase64 as JSBase64,
+const _impl = new WeakMap();
+const _initPromise = new WeakMap();
+
+class Base64 {
+  constructor() {
+    let impl;
+    if ('WebAssembly' in globalThis) {
+      _impl.set(this, impl = new WebAssemblyBase64Impl());
+    } else if ('Uint8Array' in globalThis && 'DataView' in globalThis) {
+      _impl.set(this, impl = new JavaScriptBase64Impl());
+    } else {
+      throw Error(
+        'Platform unsupported. Make sure Uint8Array and DataView exist'
+      );
+    }
+
+    _initPromise.set(this, impl.init());
+  }
+
+  /** 
+   * @returns {Promise<this>}
+   */
+  get initialized() {
+    return _initPromise.get(this).then(() => this);
+  }
 }
 
-/**
- * Factory function for `Base64` class that tests for WebAssembly availability.
- * @returns {Base64}
- */
-export async function createBase64() {
-  if ('WebAssembly' in globalThis) {
-    return await new WebAssemblyBase64().initialized;
-  } else if ('Uint8Array' in globalThis && 'DataView' in globalThis) {
-    return new JavaScriptBase64();
+export class Base64Encoder extends Base64 {
+  /**
+   * Set to encode URL friendly Base64.
+   * Decoding is not affected.
+   * @type {boolean}
+   */
+  urlFriendly = false;
+
+  /**
+   * @param {{ urlFriendly?: boolean }} [options]
+   */
+  constructor(options = {}) {
+    super(options);
+
+    const { urlFriendly = false } = options;
+    this.urlFriendly = urlFriendly;
   }
-  throw Error('Platform unsupported. Make sure Uint8Array and DataView exist');
+
+  /** 
+   * @param {ArrayBuffer} arrayBuffer
+   * @returns {string}
+   */
+  encode(arrayBuffer) {
+    return _impl.get(this).encode(arrayBuffer, this.urlFriendly);
+  }
+}
+
+export class Base64Decoder extends Base64 {
+  /** 
+   * @param {string} string
+   * @returns {ArrayBuffer}
+   */
+  decode(string) {
+    return _impl.get(this).decode(string);
+  }
 }

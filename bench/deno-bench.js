@@ -6,4 +6,4 @@ const [, __dirname, __filename] = new URL(import.meta.url).pathname.match(/^(.*)
 
 const mobyDick = await Deno.readFile(`${__dirname}/mobydick.txt`);
 
-bench(mobyDick, 10000);
+bench(mobyDick, 10_000);

@@ -3,7 +3,7 @@ import path from 'path';
 import assert from 'assert';
 
 import { toByteArray, fromByteArray } from '../index.js';
-import { WebAssemblyBase64, JavaScriptBase64 } from '../c/apache/base64.js';
+import { Base64Encoder, Base64Decoder } from '../c/apache/base64.js';
 
 const encode = str => new TextEncoder().encode(str).buffer;
 
@@ -43,51 +43,47 @@ assert.deepEqual(toByteArray("Zm9vYmFy"), encode("foobar"));
 // Try a larger text
 const mobyDick   = await fs.promises.readFile(path.resolve('test/mobydick.txt'), 'utf-8');
 const mobyDick64 = await fs.promises.readFile(path.resolve('test/mobydick.b64'), 'ascii');
+const mobyDick64URLFriendly = mobyDick64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '~');
 
 assert.deepEqual(fromByteArray(encode(mobyDick)), mobyDick64);
-assert.deepEqual(fromByteArray(encode(mobyDick), true), mobyDick64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '~'));
+assert.deepEqual(fromByteArray(encode(mobyDick), true), mobyDick64URLFriendly);
 assert.deepEqual(toByteArray(mobyDick64), encode(mobyDick));
 
-let b64 = await new WebAssemblyBase64().initialized;
+let b64e = await new Base64Encoder().initialized;
 
-assert.deepEqual(b64.encode(encode("f"     )), "Zg=="    );
-assert.deepEqual(b64.encode(encode(""      )), ""        );
-assert.deepEqual(b64.encode(encode("fo"    )), "Zm8="    );
-assert.deepEqual(b64.encode(encode("foo"   )), "Zm9v"    );
-assert.deepEqual(b64.encode(encode("foob"  )), "Zm9vYg==");
-assert.deepEqual(b64.encode(encode("fooba" )), "Zm9vYmE=");
-assert.deepEqual(b64.encode(encode("foobar")), "Zm9vYmFy");
+assert.deepEqual(b64e.encode(encode("f"     )), "Zg=="    );
+assert.deepEqual(b64e.encode(encode(""      )), ""        );
+assert.deepEqual(b64e.encode(encode("fo"    )), "Zm8="    );
+assert.deepEqual(b64e.encode(encode("foo"   )), "Zm9v"    );
+assert.deepEqual(b64e.encode(encode("foob"  )), "Zm9vYg==");
+assert.deepEqual(b64e.encode(encode("fooba" )), "Zm9vYmE=");
+assert.deepEqual(b64e.encode(encode("foobar")), "Zm9vYmFy");
 
-assert.deepEqual(b64.decode("Zg=="    ), encode("f"     ));
-assert.deepEqual(b64.decode(""        ), encode(""      ))
-assert.deepEqual(b64.decode("Zm8="    ), encode("fo"    ));
-assert.deepEqual(b64.decode("Zm9v"    ), encode("foo"   ));
-assert.deepEqual(b64.decode("Zm9vYg=="), encode("foob"  ));
-assert.deepEqual(b64.decode("Zm9vYmE="), encode("fooba" ));
-assert.deepEqual(b64.decode("Zm9vYmFy"), encode("foobar"));
+assert.deepEqual(b64e.encode(encode(mobyDick)), mobyDick64);
 
-assert.deepEqual(b64.encode(encode(mobyDick)), mobyDick64);
-assert.deepEqual(b64.decode(mobyDick64), encode(mobyDick));
+b64e.urlFriendly = true;
 
-b64 = await new JavaScriptBase64().initialized;
+assert.deepEqual(b64e.encode(encode("f"     )), "Zg~~"    );
+assert.deepEqual(b64e.encode(encode(""      )), ""        );
+assert.deepEqual(b64e.encode(encode("fo"    )), "Zm8~"    );
+assert.deepEqual(b64e.encode(encode("foo"   )), "Zm9v"    );
+assert.deepEqual(b64e.encode(encode("foob"  )), "Zm9vYg~~");
+assert.deepEqual(b64e.encode(encode("fooba" )), "Zm9vYmE~");
+assert.deepEqual(b64e.encode(encode("foobar")), "Zm9vYmFy");
 
-assert.deepEqual(b64.encode(encode("f"     )), "Zg=="    );
-assert.deepEqual(b64.encode(encode(""      )), ""        );
-assert.deepEqual(b64.encode(encode("fo"    )), "Zm8="    );
-assert.deepEqual(b64.encode(encode("foo"   )), "Zm9v"    );
-assert.deepEqual(b64.encode(encode("foob"  )), "Zm9vYg==");
-assert.deepEqual(b64.encode(encode("fooba" )), "Zm9vYmE=");
-assert.deepEqual(b64.encode(encode("foobar")), "Zm9vYmFy");
+assert.deepEqual(b64e.encode(encode(mobyDick)), mobyDick64URLFriendly);
 
-assert.deepEqual(b64.decode("Zg=="    ), encode("f"     ));
-assert.deepEqual(b64.decode(""        ), encode(""      ))
-assert.deepEqual(b64.decode("Zm8="    ), encode("fo"    ));
-assert.deepEqual(b64.decode("Zm9v"    ), encode("foo"   ));
-assert.deepEqual(b64.decode("Zm9vYg=="), encode("foob"  ));
-assert.deepEqual(b64.decode("Zm9vYmE="), encode("fooba" ));
-assert.deepEqual(b64.decode("Zm9vYmFy"), encode("foobar"));
+let b64d = await new Base64Decoder().initialized;
 
-assert.deepEqual(b64.encode(encode(mobyDick)), mobyDick64);
-assert.deepEqual(b64.decode(mobyDick64), encode(mobyDick));
+assert.deepEqual(b64d.decode("Zg=="    ), encode("f"     ));
+assert.deepEqual(b64d.decode(""        ), encode(""      ))
+assert.deepEqual(b64d.decode("Zm8="    ), encode("fo"    ));
+assert.deepEqual(b64d.decode("Zm9v"    ), encode("foo"   ));
+assert.deepEqual(b64d.decode("Zm9vYg=="), encode("foob"  ));
+assert.deepEqual(b64d.decode("Zm9vYmE="), encode("fooba" ));
+assert.deepEqual(b64d.decode("Zm9vYmFy"), encode("foobar"));
+
+assert.deepEqual(b64d.decode(mobyDick64), encode(mobyDick));
+assert.deepEqual(b64d.decode(mobyDick64URLFriendly), encode(mobyDick));
 
 })();
