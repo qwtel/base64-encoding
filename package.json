@@ -21,7 +21,7 @@
     "build": "node scripts/build.js",
     "build:wasm": "npm run build:wasm:cpp && npm run build:wasm:b64 && npm run build:wasm:sub",
     "build:wasm:cpp": "clang --target=wasm32 -O3 -flto -nostdlib -Wl,--no-entry -Wl,--export-all -Wl,--lto-O3 -o c/apache/base64.wasm c/apache/base64.c",
-    "build:wasm:b64": "base64 c/apache/base64.wasm | fold -w120 > c/apache/base64.b64",
+    "build:wasm:b64": "base64 c/apache/base64.wasm | fold -w80 > c/apache/base64.b64",
     "build:wasm:sub": "node scripts/sub.js",
     "prepack": "npm run build && npm run build"
   },
