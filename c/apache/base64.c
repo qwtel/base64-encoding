@@ -92,10 +92,10 @@ static const unsigned char pr2six[256] =
     /* ASCII table */
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
-    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
+    64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 62, 64, 63,
     52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 64, 64, 64, 64, 64, 64,
     64,  0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14,
-    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 64,
+    15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 64, 64, 64, 64, 63,
     64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
     41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64,
     64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
@@ -168,18 +168,24 @@ int Base64decode(char *bufplain, const char *bufcoded)
     return nbytesdecoded;
 }
 
-static const char basis_64[] =
+static const char basis_64_def[] =
     "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+static const char basis_64_url[] =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
 int Base64encode_len(int len)
 {
     return ((len + 2) / 3 * 4) + 1;
 }
 
-int Base64encode(char *encoded, const char *string, int len)
+int Base64encode(char *encoded, const char *string, int len, int url)
 {
     int i;
     char *p;
+
+    const char* basis_64 = url == 1 ? basis_64_url : basis_64_def;
+    const char pad = url == 1 ? '~' : '=';
 
     p = encoded;
     for (i = 0; i < len - 2; i += 3) {
@@ -194,14 +200,14 @@ int Base64encode(char *encoded, const char *string, int len)
     *p++ = basis_64[(string[i] >> 2) & 0x3F];
     if (i == (len - 1)) {
         *p++ = basis_64[((string[i] & 0x3) << 4)];
-        *p++ = '=';
+        *p++ = pad;
     }
     else {
         *p++ = basis_64[((string[i] & 0x3) << 4) |
                         ((int) (string[i + 1] & 0xF0) >> 4)];
         *p++ = basis_64[((string[i + 1] & 0xF) << 2)];
     }
-    *p++ = '=';
+    *p++ = pad;
     }
 
     *p++ = '\0';
