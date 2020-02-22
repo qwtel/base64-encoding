@@ -303,7 +303,7 @@ export class JavaScriptBase64 extends Base64 {
    * @returns {string}
    */
   encode(arrayBuffer) {
-    return encodeJS(arrayBuffer);
+    return encodeJS(arrayBuffer, this.urlFriendly);
   }
 
   /** 
