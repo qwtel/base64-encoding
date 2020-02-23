@@ -19,8 +19,6 @@ const CODE_URL = SAME + '-_'
 const PAD_B64 = '='
 const PAD_URL = '~'
 
-
-
 const MAX_CHUNK_LENGTH = 16383 // must be multiple of 3
 
 for (let i = 0, len = CODE_B64.length; i < len; ++i) {

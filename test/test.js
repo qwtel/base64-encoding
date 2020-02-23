@@ -41,9 +41,16 @@ assert.deepEqual(toByteArray("Zm9vYmE~"), encode("fooba" ));
 assert.deepEqual(toByteArray("Zm9vYmFy"), encode("foobar"));
 
 // Try a larger text
-const mobyDick   = await fs.promises.readFile(path.resolve('test/mobydick.txt'), 'utf-8');
-const mobyDick64 = await fs.promises.readFile(path.resolve('test/mobydick.b64'), 'ascii');
-const mobyDick64URLFriendly = mobyDick64.replace(/\+/g, '-').replace(/\//g, '_').replace(/\=/g, '~');
+const mobyDick   = await fs.promises.readFile(
+  path.resolve('test/mobydick.txt'), 'utf-8');
+
+const mobyDick64 = await fs.promises.readFile(
+  path.resolve('test/mobydick.b64'), 'ascii');
+
+const mobyDick64URLFriendly = mobyDick64
+  .replace(/\+/g, '-')
+  .replace(/\//g, '_')
+  .replace(/\=/g, '~');
 
 assert.deepEqual(fromByteArray(encode(mobyDick)),       mobyDick64           );
 assert.deepEqual(fromByteArray(encode(mobyDick), true), mobyDick64URLFriendly);
