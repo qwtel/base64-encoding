@@ -1,4 +1,9 @@
 /*
+ * CHANGES MADE TO ORIGINAL (2020-02-23):
+ * - Added option to encode URL-friendly Base64
+ * - Decodes URL-friendly Base64 by default
+ */
+/*
  * Copyright (c) 2003 Apple Computer, Inc. All rights reserved.
  *
  * @APPLE_LICENSE_HEADER_START@

@@ -17,3 +17,6 @@ API has slightly changed and now expects an `ArrayBuffer` instead of an `Uint8Ar
 const mobyDick = await fs.promises.readFile(path.resolve('test/mobydick.txt'));
 const b64String = fromByteArray(mobyDick.buffer)
 ```
+
+
+This product includes software developed by the Apache Group for use in the Apache HTTP server project (http://www.apache.org/).
