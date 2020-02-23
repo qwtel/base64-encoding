@@ -18,11 +18,11 @@
   "scripts": {
     "test": "node test/test.js",
     "bench": "node bench/node-bench.js",
-    "build": "node scripts/build.js",
-    "build:wasm": "npm run build:wasm:cpp && npm run build:wasm:b64 && npm run build:wasm:sub",
-    "build:wasm:cpp": "clang --target=wasm32 -O3 -flto -nostdlib -Wl,--no-entry -Wl,--export-all -Wl,--lto-O3 -o c/apache/base64.wasm c/apache/base64.c",
-    "build:wasm:b64": "base64 c/apache/base64.wasm | fold -w80 > c/apache/base64.b64",
-    "build:wasm:sub": "node scripts/sub.js",
+    "build": "npm run build:wasm && npm run build:cjs",
+    "build:cjs": "scripts/build",
+    "build:wasm": "npm run build:wasm:cpp && npm run build:wasm:b64",
+    "build:wasm:cpp": "clang --target=wasm32 -O3 -flto -nostdlib -Wl,--no-entry -Wl,--export-all -Wl,--lto-O3 -o base64.wasm base64.c",
+    "build:wasm:b64": "base64 base64.wasm | fold -w80 | scripts/into '[A-Za-z0-9+=/][A-Za-z0-9+=/\\n]{80,}' base64.js",
     "prepack": "npm run build && npm run build"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",

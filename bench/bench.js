@@ -6,8 +6,8 @@
 import { fromByteArray as fromByteArraySwitch } from './base64-switch.js'
 import { fromByteArray as fromByteArrayMap } from './base64-map.js'
 import { fromByteArray as fromByteArrayMath } from './base64-math.js'
-import { encode } from '../index.js'
-import { Base64Encoder, Base64Decoder } from '../c/apache/base64.js';
+import { encode } from '../base64-js.js'
+import { Base64Encoder, Base64Decoder } from '../index.js';
 
 // import base64JS from 'base64-js'
 

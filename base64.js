@@ -1,9 +1,4 @@
-import '../../global-this.js';
-
-import {
-  toByteArray as decodeJS,
-  fromByteArray as encodeJS
-} from '../../index.js';
+import * as Base64JS from './base64-js.js';
 
 const WASM = `
 AGFzbQEAAAABFwRgAABgAX8Bf2ACf38Bf2AEf39/fwF/AwYFAAECAQMEBQFwAQEBBQMBAAIGIQV/AUGg
@@ -35,13 +30,9 @@ dHV2d3h5ejAxMjM0NTY3ODktXwAAAAAAAAAAAAAAAAAAAABBQkNERUZHSElKS0xNTk9QUVJTVFVWV1hZ
 WmFiY2RlZmdoaWprbG1ub3BxcnN0dXZ3eHl6MDEyMzQ1Njc4OSsvAABbBG5hbWUBVAUAEV9fd2FzbV9j
 YWxsX2N0b3JzARBCYXNlNjRkZWNvZGVfbGVuAgxCYXNlNjRkZWNvZGUDEEJhc2U2NGVuY29kZV9sZW4E
 DEJhc2U2NGVuY29kZQAlCXByb2R1Y2VycwEMcHJvY2Vzc2VkLWJ5AQVjbGFuZwU5LjAuMQ==
-`.trim().split('\n').join('');
+`.trim().replace(/\n/g, '');
 
 const BYTES_PER_PAGE = 64 * 1024;
-
-// TODO: Enforce max size
-// TODO: Shrink/discard after use?
-// TODO: Encode streaming!?
 
 function ensureMemory(memory, pointer, targetLength) {
   const availableMemory = memory.buffer.byteLength - pointer;
@@ -96,6 +87,7 @@ function writeIntoMemory(instance, memory, arrayBuffer) {
   const stringLen = arrayBuffer.byteLength;
   ensureMemory(memory, pString, stringLen);
 
+  // +1 so we so we have an extra byte for the string termination char '\0'
   const string = new Uint8Array(memory.buffer, pString, stringLen + 1);
   string.set(new Uint8Array(arrayBuffer));
   string[stringLen] = '\0';
@@ -120,12 +112,12 @@ function encode(instance, arrayBuffer, urlFriendly) {
     pEncoded, 
     pString, 
     stringLen, 
-    urlFriendly ? 1 : 0
+    urlFriendly ? 1 : 0,
   );
   // console.timeEnd('wasm');
 
-  // NOTE: Actually, most of the runtime is spent building the string.
-  //       As far as I know, this is the fastest way.
+  // NOTE: Interestingly, most of the runtime is spent building the string.
+  //       As far as I know, this is still the fastest way.
   // console.time('text');
   const str = new TextDecoder().decode(encoded);
   // console.timeEnd('text');
@@ -135,7 +127,7 @@ function encode(instance, arrayBuffer, urlFriendly) {
 
 export class WASMImpl {
   async init() {
-    const { instance } = await WebAssembly.instantiate(decodeJS(WASM));
+    const { instance } = await WebAssembly.instantiate(Base64JS.decode(WASM));
     this.instance = instance;
     return this;
   }
@@ -149,80 +141,5 @@ export class WASMImpl {
   }
 }
 
-export class JSImpl {
-  encode(arrayBuffer, urlFriendly) {
-    return encodeJS(arrayBuffer, urlFriendly);
-  }
-
-  decode(string) {
-    return decodeJS(string);
-  }
-}
-
-const _impl = new WeakMap();
-const _initPromise = new WeakMap();
-
-class Base64 {
-  constructor() {
-    if (!'Uint8Array' in globalThis && 'DataView' in globalThis) {
-      throw Error(
-        'Platform unsupported. Make sure Uint8Array and DataView exist'
-      );
-    }
-    _impl.set(this, new JSImpl());
-  }
-
-  /** 
-   * @returns {Promise<this>}
-   */
-  get initialized() {
-    if (!_initPromise.has(this)) {
-      _initPromise.set(this, (async () => {
-        if ('WebAssembly' in globalThis) {
-          const impl = await new WASMImpl().init();
-          _impl.set(this, impl);
-          return this;
-        };
-      })());
-    }
-
-    return _initPromise.get(this);
-  }
-}
-
-export class Base64Encoder extends Base64 {
-  /**
-   * Set to encode URL friendly Base64.
-   * Decoding is not affected.
-   * @type {boolean}
-   */
-  urlFriendly = false;
-
-  /**
-   * @param {{ urlFriendly?: boolean }} [options]
-   */
-  constructor(options = {}) {
-    super(options);
-
-    const { urlFriendly = false } = options;
-    this.urlFriendly = urlFriendly;
-  }
-
-  /** 
-   * @param {ArrayBuffer} arrayBuffer
-   * @returns {string}
-   */
-  encode(arrayBuffer) {
-    return _impl.get(this).encode(arrayBuffer, this.urlFriendly);
-  }
-}
-
-export class Base64Decoder extends Base64 {
-  /** 
-   * @param {string} string
-   * @returns {ArrayBuffer}
-   */
-  decode(string) {
-    return _impl.get(this).decode(string);
-  }
-}
+// `jsImpl` is a singleton because it doesn't have any state
+export { Base64JS as jsImpl }

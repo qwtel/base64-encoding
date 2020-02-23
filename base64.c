@@ -82,10 +82,6 @@
 /* Base64 encoder/decoder. Originally Apache file ap_base64.c
  */
 
-// #include <string.h>
-
-// #include "base64.h"
-
 /* aaaack but it's fast and const should make it shared text page. */
 static const unsigned char pr2six[256] =
 {
