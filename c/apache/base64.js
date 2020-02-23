@@ -169,21 +169,24 @@ class Base64 {
         'Platform unsupported. Make sure Uint8Array and DataView exist'
       );
     }
-
     _impl.set(this, new JSImpl());
-
-    if ('WebAssembly' in globalThis) {
-      _initPromise.set(this, new WASMImpl().init().then((impl) => {
-        _impl.set(this, impl);
-      }));
-    } else _initPromise.set(this, Promise.resolve());
   }
 
   /** 
    * @returns {Promise<this>}
    */
   get initialized() {
-    return _initPromise.get(this).then(() => this);
+    if (!_initPromise.has(this)) {
+      _initPromise.set(this, (async () => {
+        if ('WebAssembly' in globalThis) {
+          const impl = await new WASMImpl().init();
+          _impl.set(this, impl);
+          return this;
+        };
+      })());
+    }
+
+    return _initPromise.get(this);
   }
 }
 
