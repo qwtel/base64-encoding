@@ -54,7 +54,8 @@ function makeNestedReplacer(newString, splitter, args2) {
 }
 
 ;(async () => {
-  for (const f of ['index.js', 'base64-js.js', 'base64.js']) {
+  const files = process.argv.splice(2);
+  for (const f of files) {
     const base = path.basename(f, '.js');
     const dest = path.resolve(`${base}.cjs`);
     await fs.promises.writeFile(dest, await commonjsify(path.resolve(f)), 'utf-8');
