@@ -45,7 +45,7 @@ export class Base64Encoder extends Base64 {
    * @param {{ urlFriendly?: boolean }} [options]
    */
   constructor(options = {}) {
-    super(options);
+    super();
 
     const { urlFriendly = false } = options;
     this.urlFriendly = urlFriendly;
