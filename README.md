@@ -1,4 +1,4 @@
-# Base64 WASM
+# Base64 Encoding
 
 Fast Base64 encoding and decoding powered by WebAssembly.
 
