@@ -20,30 +20,24 @@ THE SOFTWARE.
 
 This software includes material copied from or derived from 
 [`beatgammit/base64-js`],
-which is MIT licensed with the following copyright:
+which is [MIT]-licensed with the following copyright:
 
 > Copyright (c) 2014 Jameson Little 
 
-Parts of this software are provided under separate licenses:
-
 This software includes material copied from or derived from 
 [`base64.c`],
-which is APSL-2.0 licensed with the following copyright:
+which is [APSL-2.0]-licensed with the following copyright:
 
 > Copyright (c) 1999-2003 Apple Computer, Inc.  All Rights Reserved.
 
-A copy of the [APSL-2.0] license is provided as part of this distribution.
-
 This software includes material copied from or derived from 
 [`base64.c`],
-which is Apache-1.0 licensed with the following copyright:
+which is [Apache-1.0]-licensed with the following copyright:
 
 > Copyright (c) 1995-1999 The Apache Group.  All rights reserved.
 
 This product includes software developed by the Apache Group for use in the 
 Apache HTTP server project (http://www.apache.org/).
-
-A copy of the [Apache-1.0] license is provided as part of this distribution.
 
 
 [MIT]: licenses/MIT.md
