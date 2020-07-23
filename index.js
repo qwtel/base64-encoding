@@ -22,34 +22,53 @@ class Base64 {
       _initPromise.set(this, Promise.resolve(this));
     }
   }
-
-  /** 
-   * @returns {Promise<this>}
-   */
-  get initialized() {
-    return _initPromise.get(this);
-  }
 }
 
+/**
+ * @typedef {{ urlFriendly?: boolean }} Base64EncoderOptions
+ */
+
+/**
+ * Base64 encoder class to encode binary data in Base64 strings,
+ * similar to `TextEncoder`.
+ */
 export class Base64Encoder extends Base64 {
   /**
-   * Set to encode URL friendly Base64.
-   * Decoding is not affected.
-   * @param {boolean} urlFriendly;
+   * Set to `true` to make this instance encode data as URL-friendly Base64.
+   * @param {boolean} urlFriendly
    */
   set urlFriendly(urlFriendly) {
     _urlFriendly.set(this, urlFriendly);
   };
 
   /**
-   * @returns {boolean}
+   * @returns {boolean} Whether this encoder is set to URL-friendly encoding.
    */
   get urlFriendly() {
     return _urlFriendly.get(this);
   };
 
+  /** 
+   * A Promise that resolves when the underlying WASM implementation is 
+   * instantiated. 
+   * 
+   * Note that awaiting this promise is optional. 
+   * If the WASM instantiation is not complete, or has failed for any reason,
+   * a pure JavaScript implementation will be used instead.
+   * @returns {Promise<this>} 
+   *   This encoder after WASM initialization has completed.
+   */
+  get initialized() {
+    return _initPromise.get(this);
+  }
+
   /**
-   * @param {{ urlFriendly?: boolean }} [options]
+   * Creates a new encoder object with underlying WebAssembly instance.
+   * 
+   * Note that the WASM instance might grow its internal memory to fit large 
+   * array buffers.
+   * 
+   * @param {Base64EncoderOptions} [options] 
    */
   constructor({ urlFriendly = false } = {}) {
     super();
@@ -57,16 +76,36 @@ export class Base64Encoder extends Base64 {
   }
 
   /** 
-   * @param {ArrayBuffer} arrayBuffer
-   * @returns {string}
+   * Encodes an array buffer into a Base64 string.
+   * @param {ArrayBuffer} arrayBuffer Binary data to be Base64 encoded
+   * @returns {string} The provided array buffer encoded as a Base64 string
    */
   encode(arrayBuffer) {
     return _impl.get(this).encode(arrayBuffer, this.urlFriendly);
   }
 }
 
+/**
+ * Base64 Decoder class to convert Base64 strings into array buffers,
+ * similar to `TextDecoder`.
+ */
 export class Base64Decoder extends Base64 {
   /** 
+   * A Promise that resolves when the underlying WASM implementation is 
+   * instantiated. 
+   * 
+   * Note that awaiting this promise is optional. 
+   * If the WASM instantiation is not complete, or has failed for any reason,
+   * a pure JavaScript implementation will be used instead.
+   * @returns {Promise<this>} 
+   *   This decoder after WASM initialization has completed.
+   */
+  get initialized() {
+    return _initPromise.get(this);
+  }
+
+  /** 
+   * Decodes a Base64 string into a .
    * @param {string} string
    * @returns {ArrayBuffer}
    */

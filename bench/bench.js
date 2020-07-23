@@ -39,9 +39,9 @@ export async function bench(mobyDick, N = 1) {
     timeEnd('node/Buffer'.padEnd(P))
   }
 
-  time('web-base64'.padEnd(P))
+  time('base64-js'.padEnd(P))
   for (let i = 0; i < N; i++) x = encode(mobyDick.buffer)
-  timeEnd('web-base64'.padEnd(P))
+  timeEnd('base64-js'.padEnd(P))
 
   if (typeof window !== 'undefined' && 'FileReader' in window && 'fetch' in window) {
     // base64 to buffer

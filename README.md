@@ -1,22 +1,24 @@
-# Web Base64
-Slightly modernized version of [`base64-js`](https://github.com/beatgammit/base64-js). 
+# Base64 WASM
 
-Main difference is the option to generate URL-friendly Base64,
-where
-- `+` => `-`,
-- `/` => `_` and
-- `=` => `~` (these are unreserved URI characters according to [RFC 3986](https://tools.ietf.org/html/rfc3986#section-2.3))
+Fast Base64 encoding and decoding powered by WebAssembly.
 
-This version also drops support for platforms that don't provide `Uint8Array` and `DataView`.
+This library is modeled after the WHATWG `TextEncoder` and `TextDecoder` API,
+providing a `Base64Encoder` and `Base64Decoder` class.
 
-API has slightly changed and now expects an `ArrayBuffer` instead of an `Uint8Array`, whcih makes it easier to use with other typed arrays and without the need for additional copying. 
+The WASM binary is inlined into the JS code and is itself Base64 encoded. 
+Note that a pure JS fallback will be used if WebAssembly instantiation fails 
+for any reason.
+
+Performance-wise, this implementation provides a roughly 10x increase over a 
+pure-JS implementation, but a 10x decrease over node's own 
+`Buffer.toString('base64')`. 
 
 ## Usage
 
 ```js
-const mobyDick = await fs.promises.readFile(path.resolve('test/mobydick.txt'));
-const b64String = fromByteArray(mobyDick.buffer)
+const encoder = await new Base64Encoder().initialized;
+encoder.encode(new TextEncoder().encode('foobar'))   // => Zm9vYmFy
+
+const decoder = await new Base64Decoder().initialized;
+new TextDecoder().decode(decoder.decode("Zm9vYmFy")) // => foobar
 ```
-
-
-This product includes software developed by the Apache Group for use in the Apache HTTP server project (http://www.apache.org/).

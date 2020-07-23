@@ -1,6 +1,6 @@
 /**
  * Slightly modernized version of [`base64-js`][1]. 
- * Performance is ever so slightly improved due to pre-allocating arrays.
+ * Performance is slightly improved due to pre-allocating arrays.
  * 
  * This version drops support for platforms that don't provide 
  * `Uint8Array` and `DataView`. Use the original in those cases.
