@@ -1,6 +1,6 @@
 {
   "name": "base64-wasm",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Fast Base64 encoding powered by WebAssembly",
   "main": "index.cjs",
   "module": "index.js",
