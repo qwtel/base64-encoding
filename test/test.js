@@ -82,7 +82,7 @@ assert.deepEqual(b64e.encode(encode("foobar")), "Zm9vYmFy");
 
 assert.deepEqual(b64e.encode(encode(mobyDick)), mobyDick64);
 
-b64e.urlFriendly = true;
+b64e = await new Base64Encoder({ urlFriendly: true }).initialized;
 
 assert.deepEqual(b64e.encode(encode("f"     )), "Zg~~"    );
 assert.deepEqual(b64e.encode(encode(""      )), ""        );

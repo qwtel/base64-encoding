@@ -34,14 +34,6 @@ class Base64 {
  */
 export class Base64Encoder extends Base64 {
   /**
-   * Set to `true` to make this instance encode data as URL-friendly Base64.
-   * @param {boolean} urlFriendly
-   */
-  set urlFriendly(urlFriendly) {
-    _urlFriendly.set(this, urlFriendly);
-  };
-
-  /**
    * @returns {boolean} Whether this encoder is set to URL-friendly encoding.
    */
   get urlFriendly() {
