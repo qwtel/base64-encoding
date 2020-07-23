@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2018", "DOM"],
+    "target": "ES2018",
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "noEmit": false,
+    "emitDeclarationOnly": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "inlineSources": true,
+  },
+  "include": [
+    "index.js",
+  ],
+}
