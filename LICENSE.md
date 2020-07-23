@@ -1,5 +1,3 @@
-# The MIT License
-
 Copyright (c) 2020 Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy

@@ -28,7 +28,7 @@
     "prepack": "npm run build"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
-  "license": "MIT",
+  "license": "See license in LICENSE.md",
   "directories": {
     "test": "test"
   },
