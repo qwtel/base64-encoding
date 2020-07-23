@@ -1,5 +1,3 @@
-import './global-this.js';
-
 import { jsImpl, WASMImpl } from './base64.js';
 
 const _impl = new WeakMap();
@@ -7,15 +5,15 @@ const _initPromise = new WeakMap();
 
 class Base64 {
   constructor() {
-    if (!'Uint8Array' in globalThis && 'DataView' in globalThis) {
+    if (typeof Uint8Array === 'undefined' || typeof DataView === 'undefined') {
       throw Error(
-        'Platform unsupported. Make sure Uint8Array and DataView exist'
+        'Platform unsupported. Make sure Uint8Array and DataView exist.'
       );
     }
 
     _impl.set(this, jsImpl);
 
-    if ('WebAssembly' in globalThis) {
+    if (typeof 'WebAssembly' !== 'undefined') {
       _initPromise.set(this, new WASMImpl().init().then((impl) => {
         _impl.set(this, impl);
         return this;
