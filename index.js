@@ -2,6 +2,7 @@ import { jsImpl, WASMImpl } from './base64.js';
 
 const _impl = new WeakMap();
 const _initPromise = new WeakMap();
+const _urlFriendly = new WeakMap();
 
 class Base64 {
   constructor() {
@@ -35,18 +36,25 @@ export class Base64Encoder extends Base64 {
   /**
    * Set to encode URL friendly Base64.
    * Decoding is not affected.
-   * @type {boolean}
+   * @param {boolean} urlFriendly;
    */
-  urlFriendly = false;
+  set urlFriendly(urlFriendly) {
+    _urlFriendly.set(this, urlFriendly);
+  };
+
+  /**
+   * @returns {boolean}
+   */
+  get urlFriendly() {
+    return _urlFriendly.get(this);
+  };
 
   /**
    * @param {{ urlFriendly?: boolean }} [options]
    */
-  constructor(options = {}) {
+  constructor({ urlFriendly = false } = {}) {
     super();
-
-    const { urlFriendly = false } = options;
-    this.urlFriendly = urlFriendly;
+    _urlFriendly.set(this, urlFriendly);
   }
 
   /** 
