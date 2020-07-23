@@ -15,10 +15,9 @@ class Base64 {
     _impl.set(this, jsImpl);
 
     if (typeof 'WebAssembly' !== 'undefined') {
-      _initPromise.set(this, new WASMImpl().init().then((impl) => {
-        _impl.set(this, impl);
-        return this;
-      }));
+      _initPromise.set(this, new WASMImpl().init()
+        .then(impl => (_impl.set(this, impl), this))
+        .catch(() => this));
     } else {
       _initPromise.set(this, Promise.resolve(this));
     }
