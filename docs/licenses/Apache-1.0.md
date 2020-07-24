@@ -1,3 +1,5 @@
+# Apache License
+
 Copyright (c) 1995-1999 The Apache Group. All rights reserved.
 
 Redistribution and use in source and binary forms, with or without 
