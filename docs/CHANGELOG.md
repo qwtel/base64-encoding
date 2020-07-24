@@ -1,7 +1,8 @@
 # CHANGELOG
 
 ## v0.3.0
-- Add docs
+- Create npm-publish.yml
+- Add docs folder
 
 ## v0.2.0
 - Update license
