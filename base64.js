@@ -28,7 +28,7 @@ function textEncodeIntoMemory(instance, memory, str) {
 
   const bufCoded = new Uint8Array(memory.buffer, pBufCoded, bufCodedLen + 1);
   textEncodeInto(bufCoded, str);
-  bufCoded[bufCodedLen] = '\0';
+  bufCoded[bufCodedLen] = 0;
 
   return [pBufCoded, bufCodedLen]
 }
@@ -65,7 +65,7 @@ function writeIntoMemory(instance, memory, arrayBuffer) {
   // +1 so we so we have an extra byte for the string termination char '\0'
   const string = new Uint8Array(memory.buffer, pString, stringLen + 1);
   string.set(new Uint8Array(arrayBuffer));
-  string[stringLen] = '\0';
+  string[stringLen] = 0;
 
   return [pString, stringLen];
 }

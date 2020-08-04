@@ -139,7 +139,9 @@ function encodeChunk (lookup, view, start, end) {
  * @returns {string} The contents a Base64 string.
  */
 export function fromByteArray(bufferSource, urlFriendly = false) {
-  const view = new DataView(bufferSource.buffer || bufferSource)
+  const view = new DataView(bufferSource instanceof ArrayBuffer 
+     ? bufferSource 
+     : bufferSource.buffer);
   const len = view.byteLength
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
   const len2 = len - extraBytes

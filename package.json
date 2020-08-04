@@ -17,6 +17,7 @@
     }
   },
   "scripts": {
+    "clean": "rm *.cjs *.d.ts*",
     "test": "node test/test.js",
     "bench": "node bench/node-bench.js",
     "copy": "cp docs/README.md README.md && cp docs/LICENSE.md LICENSE.md",
@@ -24,7 +25,7 @@
     "sed:_config": "sed -i '' -E \"s/$npm_package_name-[0-9]+\\.[0-9]+\\.[0-9]+/$npm_package_name-$npm_package_version/\" docs/_config.yml",
     "sed:LICENSE": "sed -i '' -E \"s:licenses/:docs/licenses/:\" LICENSE.md",
     "build": "npm run build:wasm && npm run build:cjs && npm run build:dts",
-    "build:cjs": "scripts/build.js index.js base64.js base64-js.js",
+    "build:cjs": "for f in *.js; do babel $f --plugins=@babel/plugin-transform-modules-commonjs > \"${f%.js}.cjs\"; done",
     "build:dts": "tsc -d",
     "build:wasm": "npm run build:wasm:cpp && npm run build:wasm:b64",
     "build:wasm:cpp": "clang --target=wasm32 -O3 -flto -nostdlib -Wl,--no-entry -Wl,--export-all -Wl,--lto-O3 -o base64.wasm base64.c",
@@ -43,6 +44,9 @@
   },
   "homepage": "https://qwtel.com/base64-encoding/",
   "devDependencies": {
+    "@babel/cli": "^7.10.5",
+    "@babel/core": "^7.11.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.10.4",
     "base64-js": "^1.3.1",
     "typescript": "^3.9.7"
   },
