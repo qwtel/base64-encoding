@@ -186,7 +186,7 @@ int Base64encode(char *encoded, const char *string, int len, int url)
     char *p;
 
     const char* basis_64 = url == 1 ? basis_64_url : basis_64_def;
-    const char pad = url == 1 ? '~' : '=';
+    const char pad = url == 1 ? '.' : '=';
 
     p = encoded;
     for (i = 0; i < len - 2; i += 3) {

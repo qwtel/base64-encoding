@@ -13,11 +13,10 @@ const b64lookup = []
 const urlLookup = []
 const revLookup = []
 
-const SAME = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-const CODE_B64 = SAME + '+/'
-const CODE_URL = SAME + '-_'
-const PAD_B64 = '='
-const PAD_URL = '~'
+const CODE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+const CODE_B64 = CODE + '+/'
+const CODE_URL = CODE + '-_'
+const PAD = '='
 
 const MAX_CHUNK_LENGTH = 16383 // must be multiple of 3
 
@@ -35,14 +34,9 @@ revLookup['_'.charCodeAt(0)] = 63;
 function getLens (b64) {
   const len = b64.length
 
-  if (len % 4 > 0) {
-    throw new Error('Invalid string. Length must be a multiple of 4')
-  }
-
   // Trim off extra bytes after placeholder bytes are found
   // See: https://github.com/beatgammit/base64-js/issues/42
-  let validLen = b64.indexOf(PAD_B64)
-  if (validLen === -1) validLen = b64.indexOf(PAD_URL)
+  let validLen = b64.indexOf(PAD)
   if (validLen === -1) validLen = len
 
   const placeHoldersLen = validLen === len
@@ -52,12 +46,6 @@ function getLens (b64) {
   return [validLen, placeHoldersLen]
 }
 
-// base64 is 4/3 + up to two characters of the original data
-export function byteLength(b64) {
-  const [validLen, placeHoldersLen] = getLens(b64)
-  return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
-}
-
 function _byteLength(validLen, placeHoldersLen) {
   return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
@@ -65,12 +53,7 @@ function _byteLength(validLen, placeHoldersLen) {
 /**
  * Takes a base 64 string and converts it to an array buffer.
  * Accepts both regular Base64 and the URL-friendly variant,
- * where
- * - `+` => `-`,
- * - `/` => `_` and
- * - `=` => `~` (these are unreserved URI characters according to [RFC 3986][2])
- * 
- * [2]: https://tools.ietf.org/html/rfc3986#section-2.3
+ * where `+` => `-`, `/` => `_`, and the padding character is omitted.
  * 
  * @param {string} str 
  *   A Base64 string in either regular or  URL-friendly representation
@@ -79,6 +62,12 @@ function _byteLength(validLen, placeHoldersLen) {
  */
 export function toByteArray(str) {
   let tmp
+
+  switch (str.length % 4) {
+    case 2: str += "=="; break;
+    case 3: str += "="; break;
+  }
+
   const [validLen, placeHoldersLen] = getLens(str)
 
   const arr = new Uint8Array(_byteLength(validLen, placeHoldersLen))
@@ -158,7 +147,7 @@ export function fromByteArray(bufferSource, urlFriendly = false) {
     Math.floor(len2 / MAX_CHUNK_LENGTH) + Math.sign(extraBytes)
   )
   const lookup = urlFriendly ? urlLookup : b64lookup;
-  const pad = urlFriendly ? PAD_URL : PAD_B64
+  const pad = urlFriendly ? '' : PAD
 
   // Go through the array every three bytes, we'll deal with trailing stuff 
   // later
