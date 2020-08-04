@@ -14,7 +14,7 @@ async function read(stream) {
     const [,, regex, o] = process.argv;
     const stdin = await read(process.stdin);
     const a = await fs.readFile(resolve(o), 'utf-8');
-    const c = a.replace(new RegExp(regex), stdin);
+    const c = a.replace(new RegExp(regex), stdin.trimRight());
     await fs.writeFile(resolve(o), c, 'utf-8');
     process.exit(0);
   } catch (e) {
