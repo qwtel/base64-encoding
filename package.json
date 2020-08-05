@@ -2,7 +2,7 @@
   "name": "base64-encoding",
   "version": "0.5.0",
   "description": "Fast Base64 encoding powered by WebAssembly",
-  "main": "cjs/index.js",
+  "main": "cjs/index.cjs",
   "module": "mjs/index.js",
   "type": "module",
   "files": [
@@ -11,13 +11,12 @@
     "dist"
   ],
   "exports": {
-    ".": {
-      "import": "./mjs/index.js",
-      "require": "./cjs/index.js"
-    }
+    "import": "./mjs/index.js",
+    "require": "./cjs/index.cjs"
   },
   "scripts": {
     "clean": "rm -rf mjs cjs dist",
+    "pretest": "npm run build:dist:mjs",
     "test": "node test/test.js",
     "bench": "node bench/node-bench.js",
     "copy": "cp docs/README.md README.md && cp docs/LICENSE.md LICENSE.md",
@@ -30,10 +29,10 @@
     "build:wasm:b64": "base64 src/base64.wasm | scripts/into.js '[A-Za-z0-9+=/]{80,}' src/base64.js",
     "build:dist": "(npm run build:dist:mjs & npm run build:dist:cjs & wait) && npm run build:dist:dist",
     "build:dist:mjs": "tsc -d -p tsconfig.mjs.json",
-    "build:dist:cjs": "tsc -d -p tsconfig.cjs.json",
+    "build:dist:cjs": "tsc -d -p tsconfig.cjs.json && sed -i '' -E 's/\\.js/.cjs/g' cjs/*.js && for f in cjs/*.js; do mv \"$f\" \"${f%.js}.cjs\"; done",
     "build:dist:dist": "rollup -c",
     "version": "npm run copy && npm run sed && git add .",
-    "prepack": "npm run build"
+    "prepack": "npm run clean && npm run build"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
   "license": "See license in LICENSE.md",

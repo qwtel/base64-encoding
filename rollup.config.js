@@ -5,7 +5,7 @@ import { uglify } from "rollup-plugin-uglify";
 
 export default [
   {
-    input: 'cjs/index.js',
+    input: 'cjs/index.cjs',
     output: {
       file: `dist/index.js`,
       format: 'umd',
