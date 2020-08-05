@@ -3,6 +3,22 @@ import { jsImpl, WASMImpl } from './base64.js';
 const _impl = new WeakMap();
 const _urlFriendly = new WeakMap();
 
+/**
+ * @this {Base64}
+ */
+async function instantiate() {
+  if (typeof WebAssembly !== 'undefined') {
+    try {
+      _impl.set(this, await new WASMImpl().init());
+    } catch (err) {
+      throw new Error('WASM instantiation failed: ' + err.message);
+    }
+  } else {
+    throw new Error('WebAssembly missing from global scope.');
+  }
+  return this;
+}
+
 class Base64 {
   constructor() {
     if (typeof Uint8Array === 'undefined' || typeof DataView === 'undefined') {
@@ -11,19 +27,6 @@ class Base64 {
       );
     }
     _impl.set(this, jsImpl);
-  }
-
-  async optimize() {
-    if (typeof WebAssembly !== 'undefined') {
-      try {
-        _impl.set(this, await new WASMImpl().init());
-      } catch (err) {
-        throw new Error('WASM instantiation failed: ' + err.message);
-      }
-    } else {
-      throw new Error('WebAssembly missing from global scope.');
-    }
-    return this;
   }
 }
 
@@ -48,7 +51,9 @@ export class Base64Encoder extends Base64 {
    * @returns {Promise<this>} 
    *   This encoder after WASM initialization has completed.
    */
-  optimize() { return super.optimize() }
+  optimize() { 
+    return instantiate.call(this);
+  }
 
   /**
    * Creates a new encoder object with underlying WebAssembly instance.
@@ -84,7 +89,9 @@ export class Base64Decoder extends Base64 {
    * @returns {Promise<this>} 
    *   This decoder after WASM initialization has completed.
    */
-  optimize() { return super.optimize() }
+  optimize() { 
+    return instantiate.call(this);
+  }
 
   /** 
    * Decodes a Base64 string into a .
