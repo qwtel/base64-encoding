@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.6.0
+- Update CHANGELOG.md
+- Fix require~~
+- Update README.md
+
 ## v0.5.0
 - Update README
 - Improve bench
