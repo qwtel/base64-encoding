@@ -1,5 +1,16 @@
 # CHANGELOG
 
+## v0.4.0
+- Update build
+- Make instantiate private
+- Add bytes/sec
+- Decode wasm string only once
+- Make WASM optimization optional
+- Fix url friendly encoding
+- Compile w/ babel
+- Remove newlines from inline b64
+- Omit padding for url friendliness
+
 ## v0.3.0
 - Create npm-publish.yml
 - Add docs folder
