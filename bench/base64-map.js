@@ -1,15 +1,3 @@
-/**
- * Slightly modernized version of [`base64-js`](https://github.com/beatgammit/base64-js). 
- * Performance should be close to the same.
- * Main difference is the option to generate URL-friendly Base64,
- * where
- * - `+` => `-`,
- * - `/` => `_` and
- * - `=` => `~` (these are unreserved URI characters according to [RFC 3986](https://tools.ietf.org/html/rfc3986#section-2.3))
- * 
- * This version also drops support for platforms that don't provide `Uint8Array` and `DataView` (use a polyfill instead).
- */
-
 const b64lookup = new Map()
 const urlLookup = new Map()
 const revLookup = new Map()
@@ -63,17 +51,6 @@ function _byteLength(validLen, placeHoldersLen) {
   return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
 
-/**
- * Takes a base 64 string and converts it to `Uint8Array`.
- * Accepts both regualar Base64 and the URL-friendly variant,
- * where
- * - `+` => `-`,
- * - `/` => `_` and
- * - `=` => `~` (these are unreserved URI characters according to [RFC 3986](https://tools.ietf.org/html/rfc3986#section-2.3))
- * 
- * @param {string} b64 A Base64 string in either regular or URL-friendly representation
- * @returns {ArrayBuffer} The binary data as an `ArrayBuffer`.
- */
 export function toByteArray(b64) {
   let tmp
   const [validLen, placeHoldersLen] = getLens(b64)

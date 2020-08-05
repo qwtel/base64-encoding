@@ -2,9 +2,7 @@ import { bench } from './bench.js';
 
 ;(async () => {
 
-const args = [new Uint8Array(await fetch('./mobydick.txt').then(x => x.arrayBuffer())), 10000];
-// const args = [new Uint8Array(await fetch('./homebridge.log').then(x => x.arrayBuffer())), 1];
-
-bench(...args);
+await bench(new Uint8Array(await fetch('./mobydick.txt').then(x => x.arrayBuffer())), 68_104);
+await bench(new Uint8Array(await fetch('./movie.mov').then(x => x.arrayBuffer())), 1);
 
 })();

@@ -1,15 +1,3 @@
-/**
- * Slightly modernized version of [`base64-js`](https://github.com/beatgammit/base64-js). 
- * Performance should be close to the same.
- * Main difference is the option to generate URL-friendly Base64,
- * where
- * - `+` => `-`,
- * - `/` => `_` and
- * - `=` => `~` (these are unreserved URI characters according to [RFC 3986](https://tools.ietf.org/html/rfc3986#section-2.3))
- * 
- * This version also drops support for platforms that don't provide `Uint8Array` and `DataView` (use a polyfill instead).
- */
-
 const PAD_B64  = '='
 const PAD_URL  = '~'
 
@@ -78,13 +66,6 @@ function _byteLength(validLen, placeHoldersLen) {
 }
 
 /**
- * Takes a base 64 string and converts it to `Uint8Array`.
- * Accepts both regualar Base64 and the URL-friendly variant,
- * where
- * - `+` => `-`,
- * - `/` => `_` and
- * - `=` => `~` (these are unreserved URI characters according to [RFC 3986](https://tools.ietf.org/html/rfc3986#section-2.3))
- * 
  * @param {string} b64 A Base64 string in either regular or URL-friendly representation
  * @returns {ArrayBuffer} The binary data as an `ArrayBuffer`.
  */
@@ -154,12 +135,6 @@ function encodeChunk (lookup, view, start, end) {
   return output.join('')
 }
 
-/**
- * 
- * @param {ArrayBuffer} arrayBuffer 
- * @param {boolean} [urlFriendly] Set to true to encode in a URL-friendly way.
- * @returns {string} The contents of `typedArray` as a Base64 string.
- */
 export function fromByteArray(arrayBuffer, urlFriendly = false) {
   let tmp
   const view = new DataView(arrayBuffer)
