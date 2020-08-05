@@ -95,9 +95,12 @@ function encode(instance, arrayBuffer, urlFriendly) {
   return str;
 }
 
+let decodedWASM = null;
+
 export class WASMImpl {
   async init() {
-    const { instance } = await WebAssembly.instantiate(Base64JS.decode(WASM));
+    decodedWASM = decodedWASM || Base64JS.decode(WASM);
+    const { instance } = await WebAssembly.instantiate(decodedWASM);
     this.instance = instance;
     return this;
   }
