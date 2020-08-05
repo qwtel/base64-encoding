@@ -16,9 +16,9 @@ pure-JS implementation, but a 10x decrease over node's own
 ## Usage
 
 ```js
-const encoder = await new Base64Encoder().initialized;
+const encoder = await new Base64Encoder().optimize();
 encoder.encode(new TextEncoder().encode('foobar'))   // => Zm9vYmFy
 
-const decoder = await new Base64Decoder().initialized;
+const decoder = await new Base64Decoder().optimize();
 new TextDecoder().decode(decoder.decode("Zm9vYmFy")) // => foobar
 ```

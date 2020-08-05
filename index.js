@@ -1,7 +1,6 @@
 import { jsImpl, WASMImpl } from './base64.js';
 
 const _impl = new WeakMap();
-const _initPromise = new WeakMap();
 const _urlFriendly = new WeakMap();
 
 class Base64 {
@@ -11,16 +10,20 @@ class Base64 {
         'Platform unsupported. Make sure Uint8Array and DataView exist.'
       );
     }
-
     _impl.set(this, jsImpl);
+  }
 
+  async optimize() {
     if (typeof WebAssembly !== 'undefined') {
-      _initPromise.set(this, new WASMImpl().init()
-        .then(impl => (_impl.set(this, impl), this))
-        .catch(() => this));
+      try {
+        _impl.set(this, await new WASMImpl().init());
+      } catch (err) {
+        throw new Error('WASM instantiation failed: ' + err.message);
+      }
     } else {
-      _initPromise.set(this, Promise.resolve(this));
+      throw new Error('WebAssembly missing from global scope.');
     }
+    return this;
   }
 }
 
@@ -41,18 +44,11 @@ export class Base64Encoder extends Base64 {
   };
 
   /** 
-   * A Promise that resolves when the underlying WASM implementation is 
-   * instantiated. 
-   * 
-   * Note that awaiting this promise is optional. 
-   * If the WASM instantiation is not complete, or has failed for any reason,
-   * a pure JavaScript implementation will be used instead.
+   * Optimize this encoder to use the faster WASM implementation.
    * @returns {Promise<this>} 
    *   This encoder after WASM initialization has completed.
    */
-  get initialized() {
-    return _initPromise.get(this);
-  }
+  optimize() { return super.optimize() }
 
   /**
    * Creates a new encoder object with underlying WebAssembly instance.
@@ -83,18 +79,12 @@ export class Base64Encoder extends Base64 {
  */
 export class Base64Decoder extends Base64 {
   /** 
-   * A Promise that resolves when the underlying WASM implementation is 
-   * instantiated. 
+   * Optimize this decoder to use the faster WASM implementation.
    * 
-   * Note that awaiting this promise is optional. 
-   * If the WASM instantiation is not complete, or has failed for any reason,
-   * a pure JavaScript implementation will be used instead.
    * @returns {Promise<this>} 
    *   This decoder after WASM initialization has completed.
    */
-  get initialized() {
-    return _initPromise.get(this);
-  }
+  optimize() { return super.optimize() }
 
   /** 
    * Decodes a Base64 string into a .

@@ -58,7 +58,7 @@ assert.deepEqual(fromByteArray(encode(mobyDick), true), mobyDick64URLFriendly);
 assert.deepEqual(toByteArray(mobyDick64), encode(mobyDick));
 
 let b64e = new Base64Encoder();
-// Testing the JS implementation before `initialized` promise resolves
+// Testing the JS implementation
 assert.deepEqual(b64e.encode(encode("f"     )), "Zg=="    );
 assert.deepEqual(b64e.encode(encode(""      )), ""        );
 assert.deepEqual(b64e.encode(encode("fo"    )), "Zm8="    );
@@ -70,7 +70,7 @@ assert.deepEqual(b64e.encode(encode("foobar")), "Zm9vYmFy");
 assert.deepEqual(b64e.encode(encode(mobyDick)), mobyDick64);
 
 // Testing the WASM implementation..
-await b64e.initialized;
+await b64e.optimize();
 
 assert.deepEqual(b64e.encode(encode("f"     )), "Zg=="    );
 assert.deepEqual(b64e.encode(encode(""      )), ""        );
@@ -83,7 +83,7 @@ assert.deepEqual(b64e.encode(encode("foobar")), "Zm9vYmFy");
 assert.deepEqual(b64e.encode(encode(mobyDick)), mobyDick64);
 
 b64e = new Base64Encoder({ urlFriendly: true });
-// Testing the JS implementation before `initialized` promise resolves
+// Testing the JS implementation
 assert.deepEqual(b64e.encode(encode("f"     )), "Zg"      );
 assert.deepEqual(b64e.encode(encode(""      )), ""        );
 assert.deepEqual(b64e.encode(encode("fo"    )), "Zm8"     );
@@ -95,7 +95,7 @@ assert.deepEqual(b64e.encode(encode("foobar")), "Zm9vYmFy");
 assert.deepEqual(b64e.encode(encode(mobyDick)), mobyDick64URLFriendly);
 
 // Testing the WASM implementation..
-await b64e.initialized;
+await b64e.optimize();
 
 assert.deepEqual(b64e.encode(encode("f"     )), "Zg"      );
 assert.deepEqual(b64e.encode(encode(""      )), ""        );
@@ -129,7 +129,7 @@ assert.deepEqual(b64d.decode("Zm9vYmFy"), encode("foobar"));
 
 assert.deepEqual(b64d.decode(mobyDick64URLFriendly), encode(mobyDick));
 
-await b64d.initialized;
+await b64d.optimize();
 
 assert.deepEqual(b64d.decode("Zg=="    ), encode("f"     ));
 assert.deepEqual(b64d.decode(""        ), encode(""      ));
