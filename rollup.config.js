@@ -1,15 +1,22 @@
-import { terser } from "rollup-plugin-terser";
+import resolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+import { terser } from 'rollup-plugin-terser';
+import { uglify } from "rollup-plugin-uglify";
 
 export default [
   {
-    input: 'mjs/index.js',
+    input: 'cjs/index.js',
     output: {
       file: `dist/index.js`,
       format: 'umd',
       name: 'base64Encoding',
       sourcemap: true
     },
-    plugins: [terser()],
+    plugins: [
+      resolve(),
+      commonjs(),
+      uglify(),
+    ],
   }, 
   {
     input: 'mjs/index.js',
