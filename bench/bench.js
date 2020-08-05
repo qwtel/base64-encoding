@@ -3,9 +3,9 @@
  * but it's good enough to determine that performance stayed in the same ballpark.
  */
 
-import { fromByteArray as fromByteArraySwitch } from './base64-switch.js'
-import { fromByteArray as fromByteArrayMap } from './base64-map.js'
-import { fromByteArray as fromByteArrayMath } from './base64-math.js'
+// import { fromByteArray as fromByteArraySwitch } from './base64-switch.js'
+// import { fromByteArray as fromByteArrayMap } from './base64-map.js'
+// import { fromByteArray as fromByteArrayMath } from './base64-math.js'
 import { encode } from '../base64-js.js'
 import { Base64Encoder, Base64Decoder } from '../index.js';
 
@@ -22,12 +22,17 @@ export async function bench(mobyDick, N = 1) {
 
   let x
 
-  const base64Encoder = await new Base64Encoder().initialized;
-  const base64Decoder = await new Base64Decoder().initialized;
+  const base64Encoder = await new Base64Encoder().optimize();
+  // const base64Decoder = await new Base64Decoder().optimize();
 
+  const t_start = Date.now()
   time('WebAssemblyBase64'.padEnd(P))
   for (let i = 0; i < N; i++) x = base64Encoder.encode(mobyDick.buffer)
   timeEnd('WebAssemblyBase64'.padEnd(P))
+  const t_end = Date.now()
+  const t = t_end - t_start;
+  const opssec = (mobyDick.byteLength * N) / (t / 1000)
+  console.log('bytes/s'.padEnd(P + 1), Math.floor(opssec).toLocaleString())
 
   // time('WebAssemblyBase64.promises'.padEnd(P))
   // for (let i = 0; i < N; i++) x = await base64.promises.encode(mobyDick.buffer)
