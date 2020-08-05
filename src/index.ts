@@ -1,11 +1,13 @@
 import { jsImpl, WASMImpl } from './base64.js';
 
-const _impl = new WeakMap();
-const _urlFriendly = new WeakMap();
+interface Impl {
+  encode(ab: ArrayBuffer, url: boolean): string;
+  decode(str: string): ArrayBuffer;
+}
 
-/**
- * @this {Base64}
- */
+const _impl = new WeakMap<Base64, Impl>();
+const _urlFriendly = new WeakMap<Base64, boolean>();
+
 async function instantiate() {
   if (typeof WebAssembly !== 'undefined') {
     try {
@@ -28,11 +30,27 @@ class Base64 {
     }
     _impl.set(this, jsImpl);
   }
+
+  /** 
+   * Optimize this encoder/decoder to use the faster WASM implementation.
+   * @returns This encoder after WASM initialization has completed.
+   */
+  optimize(): Promise<this> { 
+    return instantiate.call(this);
+  }
 }
 
-/**
- * @typedef {{ urlFriendly?: boolean }} Base64EncoderOptions
- */
+interface Base64EncoderOptions {
+  /**
+   * Whether this encoder is set to encode data as URL-friendly Base64.
+   * 
+   * URL-friendly here means that `+` maps to `-`, `/` maps to `_`, and 
+   * the padding characters `=` are is omitted, 
+   * while the rest of the alphabet is shared.
+   */
+  urlFriendly?: boolean;
+}
+
 
 /**
  * Base64 encoder class to encode binary data in Base64 strings,
@@ -40,40 +58,30 @@ class Base64 {
  */
 export class Base64Encoder extends Base64 {
   /**
-   * @returns {boolean} Whether this encoder is set to URL-friendly encoding.
+   * Whether this encoder is set to encode data as URL-friendly Base64.
    */
   get urlFriendly() {
     return _urlFriendly.get(this);
   };
-
-  /** 
-   * Optimize this encoder to use the faster WASM implementation.
-   * @returns {Promise<this>} 
-   *   This encoder after WASM initialization has completed.
-   */
-  optimize() { 
-    return instantiate.call(this);
-  }
 
   /**
    * Creates a new encoder object with underlying WebAssembly instance.
    * 
    * Note that the WASM instance might grow its internal memory to fit large 
    * array buffers.
-   * 
-   * @param {Base64EncoderOptions} [options] 
    */
-  constructor({ urlFriendly = false } = {}) {
+  constructor({ urlFriendly = false }: Base64EncoderOptions = {}) {
     super();
     _urlFriendly.set(this, urlFriendly);
   }
 
   /** 
    * Encodes an array buffer into a Base64 string.
-   * @param {ArrayBuffer} arrayBuffer Binary data to be Base64 encoded
-   * @returns {string} The provided array buffer encoded as a Base64 string
+   * 
+   * @param arrayBuffer Binary data to be Base64 encoded
+   * @returns The provided array buffer encoded as a Base64 string
    */
-  encode(arrayBuffer) {
+  encode(arrayBuffer: ArrayBuffer): string {
     return _impl.get(this).encode(arrayBuffer, this.urlFriendly);
   }
 }
@@ -84,21 +92,12 @@ export class Base64Encoder extends Base64 {
  */
 export class Base64Decoder extends Base64 {
   /** 
-   * Optimize this decoder to use the faster WASM implementation.
+   * Decodes a Base64 string and returns a new array buffer.
    * 
-   * @returns {Promise<this>} 
-   *   This decoder after WASM initialization has completed.
+   * @param string A Base64 string. Can be either URL friendly or not. Padding may be omitted.
+   * @returns The binary data as an array buffer.
    */
-  optimize() { 
-    return instantiate.call(this);
-  }
-
-  /** 
-   * Decodes a Base64 string into a .
-   * @param {string} string
-   * @returns {ArrayBuffer}
-   */
-  decode(string) {
+  decode(string: string): ArrayBuffer {
     return _impl.get(this).decode(string);
   }
 }

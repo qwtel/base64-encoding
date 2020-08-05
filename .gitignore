@@ -6,5 +6,7 @@ webpack
 playground
 *.tgz
 *.log
-*.cjs
+/mjs
+/cjs
+/dist
 *.d.ts*

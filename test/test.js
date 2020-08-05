@@ -2,8 +2,8 @@ import fs from 'fs';
 import path from 'path';
 import assert from 'assert';
 
-import { toByteArray, fromByteArray } from '../base64-js.js';
-import { Base64Encoder, Base64Decoder } from '../index.js';
+import { toByteArray, fromByteArray } from '../mjs/base64-js.js';
+import { Base64Encoder, Base64Decoder } from '../mjs/index.js';
 
 const encode = str => new TextEncoder().encode(str).buffer;
 

@@ -1,0 +1,17 @@
+{
+  "compilerOptions": {
+    "lib": ["ES2018", "DOM"],
+    "target": "ES2018",
+    "module": "CommonJS",
+    "outDir": "cjs",
+    "allowJs": true,
+    "checkJs": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "inlineSources": true,
+  },
+  "include": [
+    "src/index.ts"
+  ],
+}
