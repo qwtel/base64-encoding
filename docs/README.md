@@ -2,17 +2,16 @@
 
 Fast Base64 encoding and decoding powered by WebAssembly.
 
+Both API and implementation likely to change before the 1.0.0 release.
+{:.note}
+
 This library is modeled after the WHATWG `TextEncoder` and `TextDecoder` API,
 providing a `Base64Encoder` and `Base64Decoder` class.
 
-The C code was chosen based on https://github.com/gaspardpetit/base64
-
-NOTE: API and implementation likely to change until 1.0.0 release.
+The C implementation was chosen based on <https://github.com/gaspardpetit/base64>.
 
 
 ## Usage
-
-Using the WASM optimizes version works as follows:
 
 ```js
 const encoder = await new Base64Encoder().optimize();
@@ -22,7 +21,7 @@ const decoder = await new Base64Decoder().optimize();
 new TextDecoder().decode(decoder.decode("Zm9vYmFy")) // => foobar
 ```
 
-For one-shot usages you can also use the JS implementation without instantiating a WASM instance.
+For one-shot usage, you can use the JS implementation without instantiating a WASM instance:
 
 ```js
 new Base64Encoder().encode(new TextEncoder().encode('foobar'))   // => Zm9vYmFy
@@ -30,13 +29,13 @@ new TextDecoder().decode(new Base64Decoder().decode("Zm9vYmFy")) // => foobar
 ```
 
 ### URL-friendly Encoding
-This implementaiton also provides a URL-friendly variant of Base64, where
+This implementation also supports a URL-friendly variant of Base64, where
 
 - all `'+'` are mapped to `'-'`
 - all `'/'` are mapped to `'_'`
 - the padding characters `'='` are omitted
 
-To use the URL-friendly variant, provide the `urlFriendly` setting:
+To use this variant, provide the `urlFriendly` setting when creating the encoder.
 
 ```js
 const encoder = await new Base64Encoder({ urlFriendly: true }).optimize();
@@ -64,11 +63,11 @@ All module paths are fully qualified, so they can be imported in Deno or the bro
 
 Both `mjs` and `cjs` include `d.ts` type declarations and source maps, so that IntelliSense works out of the box in VSCode.
 
-The `package.json` properly sets the `main`, `module`, `type` and `exports` keys, so that both node and tools build to top will (hopefully) pick the right version.
+The `package.json` properly sets the `main`, `module`, `type` and `exports` keys, so that `package.json-`based tools will pick the right version.
 
 ### Browser
-Ideally you would use your build tool of choice using the options provided above.
-However, this module can also be imported as a UMD module directly via a script tag:
+Ideally, you would bundle this library using you build tool of choice via the options provided above.
+However, this module can also be imported as a UMD module directly via script tag:
 
 ```html
 <script src="https://unpkg.com/base64-encoding/dist/index.js"></script>
@@ -91,14 +90,18 @@ For modern browsers, using the rolled-up ES module works too:
 
 TBD
 
-Currently the C code is licensed under a ancient Apache 1.0 license that comes with some pretty oldschool requirements, such as including the following in all promotional materials:
+Currently the C code is licensed under an ancient Apache 1.0 license that comes with some pretty old-school requirements, such as including the following in all promotional materials:
 
 > This product includes software 
 > developed by the Apache Group for use in the Apache HTTP server project 
 > (http://www.apache.org/).
 
-It is very likely that `ap_base64.c` has been shipped under a Apache-2.0 license somewhere. 
+It is very likely that [`ap_base64.c`](https://github.com/dhamidi/apache-httpd-1.3.42/blob/master/src/ap/ap_base64.c) has been shipped under a Apache-2.0 license somewhere. 
 Once I locate it, this requirement will go away.
 
+## TODO
 
-tbd: https://github.com/dhamidi/apache-httpd-1.3.42/blob/master/src/ap/ap_base64.c
+- Figure out why decoding is slow
+- License
+- Change API to accept a `BufferSource` instead of `ArrayBuffer`!?
+
