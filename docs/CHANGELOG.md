@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.5.0
+- Update README
+- Improve bench
+- Serve different ES versions
+
 ## v0.4.0
 - Update build
 - Make instantiate private
