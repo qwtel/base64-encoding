@@ -30,7 +30,10 @@
     "build:mjs": "tsc -d -p tsconfig.mjs.json",
     "build:cjs": "tsc -d -p tsconfig.cjs.json && sed -i '' -E 's/\\.js/.cjs/g' cjs/*.js && for f in cjs/*.js; do mv \"$f\" \"${f%.js}.cjs\"; done",
     "build:dist": "rollup -c",
-    "version": "npm run copy && npm run sed && git add .",
+    "changelog:head": "echo \"\\n\\n## v$npm_package_version\" | scripts/after.js 'CHANGELOG' docs/CHANGELOG.md",
+    "changelog:list": "git log v$npm_package_version..HEAD --pretty=format:'- %s' --reverse | scripts/after.js 'CHANGELOG' docs/CHANGELOG.md",
+    "preversion": "npm run changelog:list",
+    "version": "npm run changelog:head && npm run copy && npm run sed && git add .",
     "prepack": "npm run clean && npm run build"
   },
   "author": "Florian Klampfer <mail@qwtel.com> (https://qwtel.com/)",
