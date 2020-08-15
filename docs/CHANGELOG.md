@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.7.0
+- Fix build
+- Create changelog automagically
+- Move script to bin
+- Update build
+- Remove gpr
+
 ## v0.6.0
 - Update CHANGELOG.md
 - Fix require~~
