@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.9.0
+- Update ghaction
+- Fix npm files
+
 ## v0.8.0
 - Fix test
 - Update readme
