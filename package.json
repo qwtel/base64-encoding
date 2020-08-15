@@ -9,14 +9,14 @@
     "index*",
     "base64*",
     "cjs",
-    "dist"
+    "module"
   ],
   "exports": {
     "import": "./index.js",
     "require": "./cjs/index.cjs"
   },
   "scripts": {
-    "clean": "rm -rf cjs dist base64* index*",
+    "clean": "rm -rf cjs module base64* index*",
     "pretest": "npm run build:mjs",
     "test": "node test/test.js",
     "bench": "node bench/node-bench.js",
