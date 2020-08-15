@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.8.0
+- Fix test
+- Update readme
+
 ## v0.7.0
 - Fix build
 - Create changelog automagically

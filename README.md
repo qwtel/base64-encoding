@@ -8,7 +8,7 @@ Both API and implementation likely to change before the 1.0.0 release.
 This library is modeled after the WHATWG `TextEncoder` and `TextDecoder` API,
 providing a `Base64Encoder` and `Base64Decoder` class.
 
-The C implementation was chosen based on benchmarks provided by [`gaspardpetit/base64`](https://github.com/gaspardpetit/base64).
+The C implementation was chosen based on <https://github.com/gaspardpetit/base64>.
 
 
 ## Usage
@@ -56,14 +56,34 @@ Currently only the encoder provides a signification performance improvement over
 This module is published on npm under the [`base64-encoding`](https://www.npmjs.com/package/base64-encoding) tag. 
 The package contains the following:
 
-- The root folder ([Browse](https://unpkg.com/browse/base64-encoding/)) exports ES modules in ES2018 syntax.
-All internal module paths are fully qualified, so they can be imported in Deno or the browser directly.
-- The `module` folder ([Browse](https://unpkg.com/browse/base64-encoding/module/)) contains a rolled-up version of the above.
-- The `cjs` folder ([Browse](https://unpkg.com/browse/base64-encoding/cjs/)) exports CommonJS modules in ES5 syntax.
+- The `mjs` ([Browse](https://unpkg.com/browse/base64-encoding/mjs/)) folder exports ES modules in ES2018 syntax.
+All module paths are fully qualified, so they can be imported in Deno or the browser directly.
+- The `cjs` ([Browse](https://unpkg.com/browse/base64-encoding/cjs/)) folder exports CommonJS modules in ES5 syntax.
+- The `dist` ([Browse](https://unpkg.com/browse/base64-encoding/dist/)) provides rolled up versions as UMD (ES5) as well as ES module (ES2018).
 
-The root and `cjs` folder include type declarations and source maps, so that IntelliSense works out of the box in VSCode.
+Both `mjs` and `cjs` include `d.ts` type declarations and source maps, so that IntelliSense works out of the box in VSCode.
 
 The `package.json` properly sets the `main`, `module`, `type` and `exports` keys, so that `package.json-`based tools will pick the right version.
+
+### Browser
+Ideally, you would bundle this library using you build tool of choice via the options provided above.
+However, this module can also be imported as a UMD module directly via script tag:
+
+```html
+<script src="https://unpkg.com/base64-encoding/dist/index.js"></script>
+<script>
+ var Base64Encoder = window.base64Encoding.Base64Encoder; 
+ var Base64Decoder = window.base64Encoding.Base64Decoder;
+</script>
+```
+
+For modern browsers, using the rolled-up ES module works too:
+
+```html
+<script type="module">
+  import { Base64Encoder, Base64Decoder } from 'https://unpkg.com/base64-encoding/dist/module.js'
+</script>
+```
 
 
 ## License
