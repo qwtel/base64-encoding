@@ -5,7 +5,7 @@ import assert from 'assert';
 import { toByteArray, fromByteArray } from '../base64-js.js';
 import { Base64Encoder, Base64Decoder } from '../index.js';
 
-const encode = str => new TextEncoder().encode(str).buffer;
+const encode = str => new TextEncoder().encode(str);
 
 ;(async () => {
 

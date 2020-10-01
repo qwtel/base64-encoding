@@ -1,8 +1,8 @@
 import { jsImpl, WASMImpl } from './base64.js';
 
 interface Impl {
-  encode(ab: ArrayBuffer, url: boolean): string;
-  decode(str: string): ArrayBuffer;
+  encode(bs: BufferSource, url: boolean): string;
+  decode(str: string): Uint8Array;
 }
 
 const _impl = new WeakMap<Base64, Impl>();
@@ -70,19 +70,20 @@ export class Base64Encoder extends Base64 {
    * Note that the WASM instance might grow its internal memory to fit large 
    * array buffers.
    */
-  constructor({ urlFriendly = false }: Base64EncoderOptions = {}) {
+  constructor(options: Base64EncoderOptions = {}) {
     super();
+    const { urlFriendly = false } = options;
     _urlFriendly.set(this, urlFriendly);
   }
 
   /** 
    * Encodes an array buffer into a Base64 string.
    * 
-   * @param arrayBuffer Binary data to be Base64 encoded
+   * @param input Binary data to be Base64 encoded
    * @returns The provided array buffer encoded as a Base64 string
    */
-  encode(arrayBuffer: ArrayBuffer): string {
-    return _impl.get(this).encode(arrayBuffer, this.urlFriendly);
+  encode(input: BufferSource): string {
+    return _impl.get(this).encode(input, this.urlFriendly);
   }
 }
 
@@ -94,10 +95,10 @@ export class Base64Decoder extends Base64 {
   /** 
    * Decodes a Base64 string and returns a new array buffer.
    * 
-   * @param string A Base64 string. Can be either URL friendly or not. Padding may be omitted.
+   * @param input A Base64 string. Can be either URL friendly or not. Padding may be omitted.
    * @returns The binary data as an array buffer.
    */
-  decode(string: string): ArrayBuffer {
-    return _impl.get(this).decode(string);
+  decode(input: string): Uint8Array {
+    return _impl.get(this).decode(input);
   }
 }

@@ -57,8 +57,8 @@ function _byteLength(validLen, placeHoldersLen) {
  * 
  * @param {string} str 
  *   A Base64 string in either regular or  URL-friendly representation
- * @returns {ArrayBuffer}
- *   The binary data as an `ArrayBuffer`.
+ * @returns {Uint8Array}
+ *   The binary data as `Uint8Array`.
  */
 export function toByteArray(str) {
   let tmp
@@ -107,7 +107,7 @@ export function toByteArray(str) {
     arr[curByte++] =  tmp        & 0xff
   }
 
-  return arr.buffer
+  return arr;
 }
 
 function tripletToBase64 (lookup, num) {

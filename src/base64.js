@@ -4,6 +4,11 @@ const WASM = `AGFzbQEAAAABFwRgAX8Bf2AAAGACf38Bf2AEf39/fwF/AwYFAQACAAMFAwEAAgYkBn
 
 const BYTES_PER_PAGE = 64 * 1024;
 
+/**
+ * @param {WebAssembly.Memory} memory 
+ * @param {number} pointer 
+ * @param {number} targetLength 
+ */
 function ensureMemory(memory, pointer, targetLength) {
   const availableMemory = memory.buffer.byteLength - pointer;
   if (availableMemory < targetLength) {
@@ -12,6 +17,10 @@ function ensureMemory(memory, pointer, targetLength) {
   }
 }
 
+/**
+ * @param {Uint8Array} uint8 
+ * @param {string} str 
+ */
 function textEncodeInto(uint8, str) {
   if ('encodeInto' in TextEncoder.prototype) {
     new TextEncoder().encodeInto(str, uint8)
@@ -21,6 +30,11 @@ function textEncodeInto(uint8, str) {
   return uint8;
 }
 
+/**
+ * @param {*} instance 
+ * @param {WebAssembly.Memory} memory 
+ * @param {string} str 
+ */
 function textEncodeIntoMemory(instance, memory, str) {
   const pBufCoded = instance.exports.__heap_base.value;
   const bufCodedLen = str.length;
@@ -33,6 +47,10 @@ function textEncodeIntoMemory(instance, memory, str) {
   return [pBufCoded, bufCodedLen]
 }
 
+/**
+ * @param {*} instance 
+ * @param {string} str 
+ */
 function decode(instance, str) {
   const { memory } = instance.exports;
 
@@ -49,27 +67,41 @@ function decode(instance, str) {
   // NOTE: We could return a view directly into WASM memory for some efficiency 
   // gains, but this would require that the caller understands that it will be
   // overwritten upon next use.
-  return new Uint8Array(bufPlain).buffer;
+  return new Uint8Array(bufPlain);
 }
 
-function writeIntoMemory(instance, memory, arrayBuffer) {
+const bs2u8 = /** @param {BufferSource} bs */ (bs) => ArrayBuffer.isView(bs)
+  ? new Uint8Array(bs.buffer, bs.byteOffset, bs.byteLength)
+  : new Uint8Array(bs);
+
+/**
+ * @param {*} instance 
+ * @param {WebAssembly.Memory} memory 
+ * @param {BufferSource} bufferSource 
+ */
+function writeIntoMemory(instance, memory, bufferSource) {
   const pString = instance.exports.__heap_base.value;
-  const stringLen = arrayBuffer.byteLength;
+  const stringLen = bufferSource.byteLength;
   ensureMemory(memory, pString, stringLen);
 
   // +1 so we so we have an extra byte for the string termination char '\0'
   const string = new Uint8Array(memory.buffer, pString, stringLen + 1);
-  string.set(new Uint8Array(arrayBuffer));
+  string.set(bs2u8(bufferSource))
   string[stringLen] = 0;
 
   return [pString, stringLen];
 }
 
-function encode(instance, arrayBuffer, urlFriendly) {
+/**
+ * @param {*} instance 
+ * @param {BufferSource} bufferSource 
+ * @param {boolean} urlFriendly 
+ */
+function encode(instance, bufferSource, urlFriendly) {
   // console.time('wasm');
   const { memory } = instance.exports;
 
-  const [pString, stringLen] = writeIntoMemory(instance, memory, arrayBuffer);
+  const [pString, stringLen] = writeIntoMemory(instance, memory, bufferSource);
 
   const pEncoded = pString + stringLen;
   const encodedLen = instance.exports.Base64encode_len(stringLen);
@@ -105,12 +137,19 @@ export class WASMImpl {
     return this;
   }
 
-  encode(arrayBuffer, urlFriendly) {
-    return encode(this.instance, arrayBuffer, urlFriendly);
+  /**
+   * @param {BufferSource} bufferSource 
+   * @param {boolean} urlFriendly 
+   */
+  encode(bufferSource, urlFriendly) {
+    return encode(this.instance, bufferSource, urlFriendly);
   }
 
-  decode(string) {
-    return decode(this.instance, string);
+  /**
+   * @param {string} input 
+   */
+  decode(input) {
+    return decode(this.instance, input);
   }
 }
 
