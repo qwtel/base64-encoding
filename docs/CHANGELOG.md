@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v0.11.0
+- Accept all buffer sources
+
 ## v0.10.0
 - Update readme
 
