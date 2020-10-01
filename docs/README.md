@@ -83,5 +83,4 @@ Once I locate it, this requirement will go away.
 
 - Figure out why decoding is slow
 - License
-- Change API to accept a `BufferSource` instead of `ArrayBuffer`!?
 
