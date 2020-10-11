@@ -48,6 +48,9 @@ interface Base64EncoderOptions {
    * the padding characters `=` are is omitted, 
    * while the rest of the alphabet is shared.
    */
+  url?: boolean;
+
+  /** @deprecated Use `url` instead. */
   urlFriendly?: boolean;
 }
 
@@ -60,8 +63,15 @@ export class Base64Encoder extends Base64 {
   /**
    * Whether this encoder is set to encode data as URL-friendly Base64.
    */
-  get urlFriendly() {
+  get url() {
     return _urlFriendly.get(this);
+  };
+
+  /**
+   * @deprecated Use `url` instead.
+   */
+  get urlFriendly() {
+    return this.url;
   };
 
   /**
@@ -72,8 +82,8 @@ export class Base64Encoder extends Base64 {
    */
   constructor(options: Base64EncoderOptions = {}) {
     super();
-    const { urlFriendly = false } = options;
-    _urlFriendly.set(this, urlFriendly);
+    const { url, urlFriendly } = options;
+    _urlFriendly.set(this, url ?? urlFriendly ?? false);
   }
 
   /** 
@@ -83,7 +93,7 @@ export class Base64Encoder extends Base64 {
    * @returns The provided array buffer encoded as a Base64 string
    */
   encode(input: BufferSource): string {
-    return _impl.get(this).encode(input, this.urlFriendly);
+    return _impl.get(this).encode(input, this.url);
   }
 }
 
