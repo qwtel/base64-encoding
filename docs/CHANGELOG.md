@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.12.0
+- Update todos in readme
+- Add src to package
+
 ## v0.11.0
 - Accept all buffer sources
 
