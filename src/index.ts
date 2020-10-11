@@ -105,7 +105,8 @@ export class Base64Decoder extends Base64 {
   /** 
    * Decodes a Base64 string and returns a new array buffer.
    * 
-   * @param input A Base64 string. Can be either URL friendly or not. Padding may be omitted.
+   * @param input A Base64 string. Can be either URL friendly or not and 
+   *   padding may be omitted.
    * @returns The binary data as an array buffer.
    */
   decode(input: string): Uint8Array {
