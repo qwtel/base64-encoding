@@ -8,6 +8,8 @@
   "files": [
     "index*",
     "base64*",
+    "tsconfig*.json",
+    "src",
     "cjs",
     "module"
   ],
