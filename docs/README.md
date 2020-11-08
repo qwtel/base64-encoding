@@ -35,10 +35,10 @@ This implementation also supports a URL-friendly variant of Base64, where
 - all `'/'` are mapped to `'_'`
 - the padding characters `'='` are omitted
 
-To use this variant, provide the `urlFriendly` setting when creating the encoder.
+To use this variant, provide the `url` setting when creating the encoder.
 
 ```js
-const encoder = await new Base64Encoder({ urlFriendly: true }).optimize();
+const encoder = await new Base64Encoder({ url: true }).optimize();
 ```
 
 For decoding URL-friendly Base64 no extra steps are required.
