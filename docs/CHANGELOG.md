@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.13.0
+- Prefer url over urlFriendly
+- Line length 80
+- Add types
+- Update bin
+- Update README.md
+
 ## v0.12.0
 - Update todos in readme
 - Add src to package
