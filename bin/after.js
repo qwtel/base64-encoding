@@ -16,8 +16,10 @@ function insert(str, index, value) {
 (async () => {
   try {
     const [,, regex, o] = process.argv;
-    const stdin = await read(process.stdin);
-    const a = await fs.readFile(resolve(o), 'utf-8');
+    const [stdin, a] = await Promise.all([
+      read(process.stdin), 
+      fs.readFile(resolve(o), 'utf-8')
+    ]);
     const m = new RegExp(regex).exec(a);
     const c = insert(a, m.index + m[0].length, stdin);
     await fs.writeFile(resolve(o), c, 'utf-8');
