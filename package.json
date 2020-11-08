@@ -17,6 +17,7 @@
     "import": "./index.js",
     "require": "./cjs/index.cjs"
   },
+  "types": "./index.d.ts",
   "scripts": {
     "clean": "rm -rf cjs module base64* index*",
     "pretest": "npm run build:mjs",
