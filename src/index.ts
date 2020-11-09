@@ -59,7 +59,7 @@ export interface Base64EncoderOptions {
 export class Base64Encoder {
   #provider: Base64Provider = new Base64Provider();
   #urlFriendly: boolean;
-  
+
   /**
    * Whether this encoder is set to encode data as URL-friendly Base64.
    */

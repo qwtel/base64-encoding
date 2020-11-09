@@ -5,8 +5,8 @@ const WASM = `AGFzbQEAAAABFwRgAX8Bf2AAAGACf38Bf2AEf39/fwF/AwYFAQACAAMFAwEAAgYkBn
 const BYTES_PER_PAGE = 64 * 1024;
 
 function ensureMemory(
-  memory: WebAssembly.Memory, 
-  pointer: number, 
+  memory: WebAssembly.Memory,
+  pointer: number,
   targetLength: number
 ) {
   const availableMemory = memory.buffer.byteLength - pointer;
@@ -24,8 +24,8 @@ const textEncodeInto: (uint8: Uint8Array, str: string) => Uint8Array =
 type Val = { value: number };
 
 function textEncodeIntoMemory(
-  instance: WebAssembly.Instance, 
-  memory: WebAssembly.Memory, 
+  instance: WebAssembly.Instance,
+  memory: WebAssembly.Memory,
   str: string
 ) {
   const pBufCoded = (instance.exports.__heap_base as Val).value;
@@ -66,9 +66,9 @@ const bs2u8 = (bs: BufferSource) => bs instanceof ArrayBuffer
   : new Uint8Array(bs.buffer, bs.byteOffset, bs.byteLength);
 
 function writeIntoMemory(
- instance: WebAssembly.Instance,
- memory: WebAssembly.Memory,
- bufferSource: BufferSource,
+  instance: WebAssembly.Instance,
+  memory: WebAssembly.Memory,
+  bufferSource: BufferSource,
 ) {
   const pString = (instance.exports.__heap_base as Val).value;
   const stringLen = bufferSource.byteLength;
