@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.14.1
+- Avoid unnecessary type checks
+- Format ts
+- Fix warning
+
 ## v0.14.0
 - Use js private properties
 - Fix buffersource conversions
