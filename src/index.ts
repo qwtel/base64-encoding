@@ -1,46 +1,44 @@
-import { jsImpl, WASMImpl } from './base64.js';
+import { jsImpl, WASMImpl } from './base64';
 
 interface Impl {
   encode(bs: BufferSource, url: boolean): string;
   decode(str: string): Uint8Array;
 }
 
-const _impl = new WeakMap<Base64, Impl>();
-const _urlFriendly = new WeakMap<Base64, boolean>();
+class Base64Provider {
+  impl: Impl;
 
-async function instantiate() {
-  if (typeof WebAssembly !== 'undefined') {
-    try {
-      _impl.set(this, await new WASMImpl().init());
-    } catch (err) {
-      throw new Error('WASM instantiation failed: ' + err.message);
-    }
-  } else {
-    throw new Error('WebAssembly missing from global scope.');
-  }
-  return this;
-}
-
-class Base64 {
   constructor() {
     if (typeof Uint8Array === 'undefined' || typeof DataView === 'undefined') {
       throw Error(
         'Platform unsupported. Make sure Uint8Array and DataView exist.'
       );
     }
-    _impl.set(this, jsImpl);
+    this.impl = jsImpl;
   }
 
-  /** 
-   * Optimize this encoder/decoder to use the faster WASM implementation.
-   * @returns This encoder after WASM initialization has completed.
-   */
-  optimize(): Promise<this> { 
-    return instantiate.call(this);
+  async init() {
+    if (typeof WebAssembly !== 'undefined') {
+      try {
+        this.impl = await new WASMImpl().init();
+      } catch (err) {
+        throw new Error('WASM instantiation failed: ' + err.message);
+      }
+    } else {
+      throw new Error('WebAssembly missing in global scope.');
+    }
+  }
+
+  encode(input: BufferSource, url: boolean): string {
+    return this.impl.encode(input, url);
+  }
+
+  decode(input: string): Uint8Array {
+    return this.impl.decode(input);
   }
 }
 
-interface Base64EncoderOptions {
+export interface Base64EncoderOptions {
   /**
    * Whether this encoder is set to encode data as URL-friendly Base64.
    * 
@@ -54,17 +52,19 @@ interface Base64EncoderOptions {
   urlFriendly?: boolean;
 }
 
-
 /**
  * Base64 encoder class to encode binary data in Base64 strings,
  * similar to `TextEncoder`.
  */
-export class Base64Encoder extends Base64 {
+export class Base64Encoder {
+  #provider: Base64Provider = new Base64Provider();
+  #urlFriendly: boolean;
+  
   /**
    * Whether this encoder is set to encode data as URL-friendly Base64.
    */
   get url() {
-    return _urlFriendly.get(this);
+    return this.#urlFriendly;
   };
 
   /**
@@ -81,9 +81,17 @@ export class Base64Encoder extends Base64 {
    * array buffers.
    */
   constructor(options: Base64EncoderOptions = {}) {
-    super();
     const { url, urlFriendly } = options;
-    _urlFriendly.set(this, url ?? urlFriendly ?? false);
+    this.#urlFriendly = url ?? urlFriendly ?? false;
+  }
+
+  /** 
+   * Optimize this encoder to use the faster WASM implementation.
+   * @returns This encoder after WASM initialization has completed.
+   */
+  async optimize(): Promise<this> { 
+    await this.#provider.init();
+    return this;
   }
 
   /** 
@@ -93,7 +101,7 @@ export class Base64Encoder extends Base64 {
    * @returns The provided array buffer encoded as a Base64 string
    */
   encode(input: BufferSource): string {
-    return _impl.get(this).encode(input, this.url);
+    return this.#provider.encode(input, this.url);
   }
 }
 
@@ -101,7 +109,18 @@ export class Base64Encoder extends Base64 {
  * Base64 Decoder class to convert Base64 strings into array buffers,
  * similar to `TextDecoder`.
  */
-export class Base64Decoder extends Base64 {
+export class Base64Decoder {
+  #provider = new Base64Provider();
+
+  /** 
+   * Optimize this decoder to use the faster WASM implementation.
+   * @returns This decoder after WASM initialization has completed.
+   */
+  async optimize(): Promise<this> { 
+    await this.#provider.init();
+    return this;
+  }
+
   /** 
    * Decodes a Base64 string and returns a new array buffer.
    * 
@@ -110,6 +129,6 @@ export class Base64Decoder extends Base64 {
    * @returns The binary data as an array buffer.
    */
   decode(input: string): Uint8Array {
-    return _impl.get(this).decode(input);
+    return this.#provider.decode(input);
   }
 }
