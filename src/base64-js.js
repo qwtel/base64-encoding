@@ -132,6 +132,10 @@ function encodeChunk (lookup, view, start, end) {
   return output.join('')
 }
 
+const bs2dv = /** @param {BufferSource} bs */ (bs) => bs instanceof ArrayBuffer
+  ? new DataView(bs)
+  : new DataView(bs.buffer, bs.byteOffset, bs.byteLength);
+
 /**
  * Encodes binary data provided in an array buffer as a Base64 string.
  * @param {BufferSource} bufferSource The raw data to encode.
@@ -139,9 +143,7 @@ function encodeChunk (lookup, view, start, end) {
  * @returns {string} The contents a Base64 string.
  */
 export function fromByteArray(bufferSource, urlFriendly = false) {
-  const view = new DataView(bufferSource instanceof ArrayBuffer 
-     ? bufferSource 
-     : bufferSource.buffer);
+  const view = bs2dv(bufferSource);
   const len = view.byteLength
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
   const len2 = len - extraBytes
