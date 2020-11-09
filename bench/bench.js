@@ -36,6 +36,10 @@ export async function bench(mobyDick, N = 1) {
   for (let i = 0; i < N; i++) x = base64Encoder.encode(mobyDick.buffer)
   timeEnd('Base64Encoder/encode'.padEnd(P))
 
+  time('base64-js/encode'.padEnd(P))
+  for (let i = 0; i < N; i++) x = encode(mobyDick.buffer)
+  timeEnd('base64-js/encode'.padEnd(P))
+
   // const t_end = Date.now()
   // const t = t_end - t_start;
   // const opssec = (mobyDick.byteLength * N) / (t / 1000)
@@ -45,10 +49,6 @@ export async function bench(mobyDick, N = 1) {
   const base64Decoder = await new Base64Decoder().optimize();
   for (let i = 0; i < N; i++) y = base64Decoder.decode(x);
   timeEnd('Base64Decoder/decode'.padEnd(P))
-
-  time('base64-js/encode'.padEnd(P))
-  for (let i = 0; i < N; i++) x = encode(mobyDick.buffer)
-  timeEnd('base64-js/encode'.padEnd(P))
 
   time('base64-js/decode'.padEnd(P))
   for (let i = 0; i < N; i++) y = decode(x)
