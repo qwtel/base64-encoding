@@ -16,14 +16,10 @@ function ensureMemory(
   }
 }
 
-function textEncodeInto(uint8: Uint8Array, str: string) {
-  if ('encodeInto' in TextEncoder.prototype) {
-    new TextEncoder().encodeInto(str, uint8)
-  } else {
-    uint8.set(new TextEncoder().encode(str))
-  }
-  return uint8;
-}
+const textEncodeInto: (uint8: Uint8Array, str: string) => Uint8Array =
+  'encodeInto' in TextEncoder.prototype
+    ? (uint8, str) => (new TextEncoder().encodeInto(str, uint8), uint8)
+    : (uint8, str) => (uint8.set(new TextEncoder().encode(str)), uint8);
 
 type Val = { value: number };
 
