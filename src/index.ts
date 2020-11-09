@@ -89,7 +89,7 @@ export class Base64Encoder {
    * Optimize this encoder to use the faster WASM implementation.
    * @returns This encoder after WASM initialization has completed.
    */
-  async optimize(): Promise<this> { 
+  async optimize() {
     await this.#provider.init();
     return this;
   }
@@ -116,7 +116,7 @@ export class Base64Decoder {
    * Optimize this decoder to use the faster WASM implementation.
    * @returns This decoder after WASM initialization has completed.
    */
-  async optimize(): Promise<this> { 
+  async optimize() {
     await this.#provider.init();
     return this;
   }
