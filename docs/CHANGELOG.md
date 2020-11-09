@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.14.0
+- Use js private properties
+- Fix buffersource conversions
+- Move to typescript
+- Reorder bench results
+
 ## v0.13.0
 - Prefer url over urlFriendly
 - Line length 80
