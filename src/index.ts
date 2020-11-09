@@ -1,4 +1,4 @@
-import { jsImpl, WASMImpl } from './base64';
+import { jsImpl, WASMImpl } from './base64.js';
 
 interface Impl {
   encode(bs: BufferSource, url: boolean): string;

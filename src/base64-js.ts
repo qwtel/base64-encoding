@@ -9,9 +9,9 @@
  * [2]: https://tools.ietf.org/html/rfc3986#section-2.3
  */
 
-const b64lookup = []
-const urlLookup = []
-const revLookup = []
+const b64lookup: string[] = []
+const urlLookup: string[] = []
+const revLookup: number[] = []
 
 const CODE = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
 const CODE_B64 = CODE + '+/'
@@ -28,10 +28,10 @@ for (let i = 0, len = CODE_B64.length; i < len; ++i) {
 
 // Support decoding URL-safe base64 strings, as Node.js does.
 // See: https://en.wikipedia.org/wiki/Base64#URL_applications
-revLookup['-'.charCodeAt(0)] = 62;
-revLookup['_'.charCodeAt(0)] = 63;
+revLookup['-'.charCodeAt(0)] = 62
+revLookup['_'.charCodeAt(0)] = 63
 
-function getLens (b64) {
+function getLens (b64: string) {
   const len = b64.length
 
   // Trim off extra bytes after placeholder bytes are found
@@ -46,7 +46,7 @@ function getLens (b64) {
   return [validLen, placeHoldersLen]
 }
 
-function _byteLength(validLen, placeHoldersLen) {
+function _byteLength(validLen: number, placeHoldersLen: number) {
   return ((validLen + placeHoldersLen) * 3 / 4) - placeHoldersLen
 }
 
@@ -55,17 +55,15 @@ function _byteLength(validLen, placeHoldersLen) {
  * Accepts both regular Base64 and the URL-friendly variant,
  * where `+` => `-`, `/` => `_`, and the padding character is omitted.
  * 
- * @param {string} str 
- *   A Base64 string in either regular or  URL-friendly representation
- * @returns {Uint8Array}
- *   The binary data as `Uint8Array`.
+ * @param str A Base64 string in either regular or  URL-friendly representation.
+ * @returns The binary data as `Uint8Array`.
  */
-export function toByteArray(str) {
-  let tmp
+export function toByteArray(str: string): Uint8Array {
+  let tmp: number
 
   switch (str.length % 4) {
-    case 2: str += "=="; break;
-    case 3: str += "="; break;
+    case 2: str += "=="; break
+    case 3: str += "="; break
   }
 
   const [validLen, placeHoldersLen] = getLens(str)
@@ -79,7 +77,7 @@ export function toByteArray(str) {
     ? validLen - 4
     : validLen
 
-  let i
+  let i: number
   for (i = 0; i < len; i += 4) {
     tmp =
       (revLookup[str.charCodeAt(i    )] << 18) |
@@ -107,10 +105,10 @@ export function toByteArray(str) {
     arr[curByte++] =  tmp        & 0xff
   }
 
-  return arr;
+  return arr
 }
 
-function tripletToBase64 (lookup, num) {
+function tripletToBase64 (lookup: string[], num: number) {
   return (
     lookup[num >> 18 & 0x3f] +
     lookup[num >> 12 & 0x3f] +
@@ -119,38 +117,46 @@ function tripletToBase64 (lookup, num) {
   )
 }
 
-function encodeChunk (lookup, view, start, end) {
-  let tmp
+function encodeChunk (
+  lookup: string[],
+  view: DataView,
+  start: number,
+  end: number
+) {
+  let tmp: number;
   const output = new Array((end - start) / 3)
   for (let i = start, j = 0; i < end; i += 3, j++) {
     tmp =
       ((view.getUint8(i    ) << 16) & 0xff0000) +
       ((view.getUint8(i + 1) <<  8) & 0x00ff00) +
       ( view.getUint8(i + 2)        & 0x0000ff)
-    output[j] = tripletToBase64(lookup, tmp);
+    output[j] = tripletToBase64(lookup, tmp)
   }
   return output.join('')
 }
 
-const bs2dv = /** @param {BufferSource} bs */ (bs) => bs instanceof ArrayBuffer
+const bs2dv = (bs: BufferSource) => bs instanceof ArrayBuffer
   ? new DataView(bs)
-  : new DataView(bs.buffer, bs.byteOffset, bs.byteLength);
+  : new DataView(bs.buffer, bs.byteOffset, bs.byteLength)
 
 /**
  * Encodes binary data provided in an array buffer as a Base64 string.
- * @param {BufferSource} bufferSource The raw data to encode.
- * @param {boolean} [urlFriendly] Set to true to encode in a URL-friendly way.
- * @returns {string} The contents a Base64 string.
+ * @param bufferSource The raw data to encode.
+ * @param urlFriendly Set to true to encode in a URL-friendly way.
+ * @returns The contents a Base64 string.
  */
-export function fromByteArray(bufferSource, urlFriendly = false) {
-  const view = bs2dv(bufferSource);
+export function fromByteArray(
+  bufferSource: BufferSource, 
+  urlFriendly = false
+): string {
+  const view = bs2dv(bufferSource)
   const len = view.byteLength
   const extraBytes = len % 3 // if we have 1 byte left, pad 2 bytes
   const len2 = len - extraBytes
   const parts = new Array(
     Math.floor(len2 / MAX_CHUNK_LENGTH) + Math.sign(extraBytes)
   )
-  const lookup = urlFriendly ? urlLookup : b64lookup;
+  const lookup = urlFriendly ? urlLookup : b64lookup
   const pad = urlFriendly ? '' : PAD
 
   // Go through the array every three bytes, we'll deal with trailing stuff 
@@ -167,7 +173,7 @@ export function fromByteArray(bufferSource, urlFriendly = false) {
 
   // pad the end with zeros, but make sure to not forget the extra bytes
   if (extraBytes === 1) {
-    let tmp = view.getUint8(len - 1);
+    let tmp = view.getUint8(len - 1)
     parts[j] = (
       lookup[ tmp >>  2]         +
       lookup[(tmp <<  4) & 0x3f] +

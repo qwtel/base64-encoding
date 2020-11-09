@@ -1,15 +1,14 @@
-import * as Base64JS from './base64-js';
+import * as Base64JS from './base64-js.js';
 
 const WASM = `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`;
 
 const BYTES_PER_PAGE = 64 * 1024;
 
-/**
- * @param {WebAssembly.Memory} memory 
- * @param {number} pointer 
- * @param {number} targetLength 
- */
-function ensureMemory(memory, pointer, targetLength) {
+function ensureMemory(
+  memory: WebAssembly.Memory, 
+  pointer: number, 
+  targetLength: number
+) {
   const availableMemory = memory.buffer.byteLength - pointer;
   if (availableMemory < targetLength) {
     const nPages = Math.ceil((targetLength - availableMemory) / BYTES_PER_PAGE);
@@ -17,11 +16,7 @@ function ensureMemory(memory, pointer, targetLength) {
   }
 }
 
-/**
- * @param {Uint8Array} uint8 
- * @param {string} str 
- */
-function textEncodeInto(uint8, str) {
+function textEncodeInto(uint8: Uint8Array, str: string) {
   if ('encodeInto' in TextEncoder.prototype) {
     new TextEncoder().encodeInto(str, uint8)
   } else {
@@ -30,13 +25,14 @@ function textEncodeInto(uint8, str) {
   return uint8;
 }
 
-/**
- * @param {*} instance 
- * @param {WebAssembly.Memory} memory 
- * @param {string} str 
- */
-function textEncodeIntoMemory(instance, memory, str) {
-  const pBufCoded = instance.exports.__heap_base.value;
+type Val = { value: number };
+
+function textEncodeIntoMemory(
+  instance: WebAssembly.Instance, 
+  memory: WebAssembly.Memory, 
+  str: string
+) {
+  const pBufCoded = (instance.exports.__heap_base as Val).value;
   const bufCodedLen = str.length;
   ensureMemory(memory, pBufCoded, bufCodedLen);
 
@@ -47,20 +43,19 @@ function textEncodeIntoMemory(instance, memory, str) {
   return [pBufCoded, bufCodedLen]
 }
 
-/**
- * @param {*} instance 
- * @param {string} str 
- */
-function decode(instance, str) {
-  const { memory } = instance.exports;
+function decode(instance: WebAssembly.Instance, str: string) {
+  const { exports } = instance;
+  const memory = exports.memory as WebAssembly.Memory;
+  const c_Base64decode_len = exports.Base64decode_len as Function;
+  const c_Base64decode = exports.Base64decode as Function;
 
   const [pBufCoded, bufCodedLen] = textEncodeIntoMemory(instance, memory, str);
 
   const pBufPlain = pBufCoded + bufCodedLen;
-  const bufPlainLen = instance.exports.Base64decode_len(pBufCoded);
+  const bufPlainLen: number = c_Base64decode_len(pBufCoded);
   ensureMemory(memory, pBufPlain, bufPlainLen);
 
-  const lenReal = instance.exports.Base64decode(pBufPlain, pBufCoded);
+  const lenReal: number = c_Base64decode(pBufPlain, pBufCoded);
   const bufPlain = new Uint8Array(memory.buffer, pBufPlain, lenReal);
 
   // Return a copy
@@ -70,17 +65,16 @@ function decode(instance, str) {
   return new Uint8Array(bufPlain);
 }
 
-const bs2u8 = /** @param {BufferSource} bs */ (bs) => bs instanceof ArrayBuffer
+const bs2u8 = (bs: BufferSource) => bs instanceof ArrayBuffer
   ? new Uint8Array(bs)
   : new Uint8Array(bs.buffer, bs.byteOffset, bs.byteLength);
 
-/**
- * @param {*} instance 
- * @param {WebAssembly.Memory} memory 
- * @param {BufferSource} bufferSource 
- */
-function writeIntoMemory(instance, memory, bufferSource) {
-  const pString = instance.exports.__heap_base.value;
+function writeIntoMemory(
+ instance: WebAssembly.Instance,
+ memory: WebAssembly.Memory,
+ bufferSource: BufferSource,
+) {
+  const pString = (instance.exports.__heap_base as Val).value;
   const stringLen = bufferSource.byteLength;
   ensureMemory(memory, pString, stringLen);
 
@@ -92,22 +86,24 @@ function writeIntoMemory(instance, memory, bufferSource) {
   return [pString, stringLen];
 }
 
-/**
- * @param {*} instance 
- * @param {BufferSource} bufferSource 
- * @param {boolean} urlFriendly 
- */
-function encode(instance, bufferSource, urlFriendly) {
+function encode(
+  instance: WebAssembly.Instance,
+  bufferSource: BufferSource,
+  urlFriendly: boolean,
+) {
   // console.time('wasm');
-  const { memory } = instance.exports;
+  const { exports } = instance;
+  const memory = exports.memory as WebAssembly.Memory;
+  const c_Base64encode_len = exports.Base64encode_len as Function;
+  const c_Base64encode = exports.Base64encode as Function;
 
   const [pString, stringLen] = writeIntoMemory(instance, memory, bufferSource);
 
   const pEncoded = pString + stringLen;
-  const encodedLen = instance.exports.Base64encode_len(stringLen);
+  const encodedLen: number = c_Base64encode_len(stringLen);
   ensureMemory(memory, pEncoded, encodedLen);
 
-  const encodedLenReal = instance.exports.Base64encode(
+  const encodedLenReal: number = c_Base64encode(
     pEncoded,
     pString,
     stringLen,
@@ -130,6 +126,8 @@ function encode(instance, bufferSource, urlFriendly) {
 let decodedWASM = null;
 
 export class WASMImpl {
+  instance: WebAssembly.Instance
+
   async init() {
     decodedWASM = decodedWASM || Base64JS.decode(WASM);
     const { instance } = await WebAssembly.instantiate(decodedWASM);
@@ -137,18 +135,14 @@ export class WASMImpl {
     return this;
   }
 
-  /**
-   * @param {BufferSource} bufferSource 
-   * @param {boolean} urlFriendly 
-   */
-  encode(bufferSource, urlFriendly) {
+  encode(bufferSource: BufferSource, urlFriendly: boolean): string {
     return encode(this.instance, bufferSource, urlFriendly);
   }
 
   /**
    * @param {string} input 
    */
-  decode(input) {
+  decode(input: string): Uint8Array {
     return decode(this.instance, input);
   }
 }

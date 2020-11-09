@@ -29,7 +29,7 @@
     "sed:LICENSE": "sed -i '' -E \"s:licenses/:docs/licenses/:\" LICENSE.md",
     "wasm": "npm run wasm:cpp && npm run wasm:b64",
     "wasm:cpp": "clang --target=wasm32 -O3 -flto -nostdlib -Wl,--no-entry -Wl,--export-all -Wl,--lto-O3 -o src/base64.wasm src/base64.c",
-    "wasm:b64": "base64 src/base64.wasm | bin/into.js '[A-Za-z0-9+=/]{80,}' src/base64.js",
+    "wasm:b64": "base64 src/base64.wasm | bin/into.js '[A-Za-z0-9+=/]{80,}' src/base64.ts",
     "build": "(npm run build:mjs & npm run build:cjs & wait) && npm run build:dist",
     "build:mjs": "tsc -d -p tsconfig.json",
     "build:cjs": "tsc -d -p tsconfig.cjs.json && sed -i '' -E 's/\\.js/.cjs/g' cjs/*.js && for f in cjs/*.js; do mv \"$f\" \"${f%.js}.cjs\"; done",
