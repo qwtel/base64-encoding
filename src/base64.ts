@@ -16,49 +16,66 @@ function ensureMemory(
   }
 }
 
-const textEncodeInto: (uint8: Uint8Array, str: string) => Uint8Array =
+const textEncodeInto: (
+  encoder: TextEncoder,
+  uint8: Uint8Array,
+  str: string,
+) => Uint8Array =
   'encodeInto' in TextEncoder.prototype
-    ? (uint8, str) => (new TextEncoder().encodeInto(str, uint8), uint8)
-    : (uint8, str) => (uint8.set(new TextEncoder().encode(str)), uint8);
+    ? (encoder, uint8, str) => (encoder.encodeInto(str, uint8), uint8)
+    : (encoder, uint8, str) => (uint8.set(encoder.encode(str)), uint8);
 
 type Val = { value: number };
 
 function textEncodeIntoMemory(
   instance: WebAssembly.Instance,
   memory: WebAssembly.Memory,
-  str: string
+  str: string,
+  encoder: TextEncoder,
 ) {
   const pBufCoded = (instance.exports.__heap_base as Val).value;
   const bufCodedLen = str.length;
   ensureMemory(memory, pBufCoded, bufCodedLen);
 
   const bufCoded = new Uint8Array(memory.buffer, pBufCoded, bufCodedLen + 1);
-  textEncodeInto(bufCoded, str);
+  textEncodeInto(encoder, bufCoded, str);
   bufCoded[bufCodedLen] = 0;
 
   return [pBufCoded, bufCodedLen]
 }
 
-function decode(instance: WebAssembly.Instance, str: string) {
+function decode(
+  instance: WebAssembly.Instance,
+  str: string,
+  encoder: TextEncoder,
+) {
   const { exports } = instance;
   const memory = exports.memory as WebAssembly.Memory;
   const c_Base64decode_len = exports.Base64decode_len as Function;
   const c_Base64decode = exports.Base64decode as Function;
 
-  const [pBufCoded, bufCodedLen] = textEncodeIntoMemory(instance, memory, str);
+  // console.time('textEncodeIntoMemory');
+  const [pBufCoded, bufCodedLen] =
+    textEncodeIntoMemory(instance, memory, str, encoder);
+  // console.timeEnd('textEncodeIntoMemory');
 
+  // console.time('c_Base64decode_len');
   const pBufPlain = pBufCoded + bufCodedLen;
   const bufPlainLen: number = c_Base64decode_len(pBufCoded);
   ensureMemory(memory, pBufPlain, bufPlainLen);
+  // console.timeEnd('c_Base64decode_len');
 
+  // console.time('c_Base64decode');
   const lenReal: number = c_Base64decode(pBufPlain, pBufCoded);
   const bufPlain = new Uint8Array(memory.buffer, pBufPlain, lenReal);
+  // console.timeEnd('c_Base64decode');
 
-  // Return a copy
-  // NOTE: We could return a view directly into WASM memory for some efficiency 
-  // gains, but this would require that the caller understands that it will be
-  // overwritten upon next use.
-  return bufPlain.slice();
+  // Return a copy to avoid returning a view directly into WASM memory.
+  // console.time('slice');
+  const ret = bufPlain.slice();
+  // console.timeEnd('slice');
+
+  return ret;
 }
 
 const bs2u8 = (bs: BufferSource) => bs instanceof ArrayBuffer
@@ -122,7 +139,8 @@ function encode(
 let decodedWASM = null;
 
 export class WASMImpl {
-  instance: WebAssembly.Instance
+  instance: WebAssembly.Instance;
+  encoder = new TextEncoder();
 
   async init() {
     decodedWASM = decodedWASM || Base64JS.decode(WASM);
@@ -135,11 +153,8 @@ export class WASMImpl {
     return encode(this.instance, bufferSource, urlFriendly);
   }
 
-  /**
-   * @param {string} input 
-   */
   decode(input: string): Uint8Array {
-    return decode(this.instance, input);
+    return decode(this.instance, input, this.encoder);
   }
 }
 
