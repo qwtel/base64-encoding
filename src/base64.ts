@@ -58,7 +58,7 @@ function decode(instance: WebAssembly.Instance, str: string) {
   // NOTE: We could return a view directly into WASM memory for some efficiency 
   // gains, but this would require that the caller understands that it will be
   // overwritten upon next use.
-  return new Uint8Array(bufPlain);
+  return bufPlain.slice();
 }
 
 const bs2u8 = (bs: BufferSource) => bs instanceof ArrayBuffer
