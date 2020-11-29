@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.14.2
+- Improve copy performance
+- Bind text encoder to instance
+- Update deps
+
 ## v0.14.1
 - Avoid unnecessary type checks
 - Format ts
