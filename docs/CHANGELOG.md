@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## v0.14.3
+- Make scripts x-platform
+
 ## v0.14.2
 - Improve copy performance
 - Bind text encoder to instance
