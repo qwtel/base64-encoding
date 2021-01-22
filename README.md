@@ -2,9 +2,6 @@
 
 Fast Base64 encoding and decoding powered by WebAssembly.
 
-Both API and implementation likely to change before the 1.0.0 release.
-{:.note}
-
 This library is modeled after the WHATWG `TextEncoder` and `TextDecoder` API,
 providing a `Base64Encoder` and `Base64Decoder` class.
 
@@ -48,7 +45,7 @@ For decoding URL-friendly Base64 no extra steps are required.
 
 TBD
 
-Currently only the encoder provides a signification performance improvement over the pure JS implementation.
+Currently only the encoder provides a significant performance improvement over the pure JS implementation.
 
 
 ## Distribution
@@ -57,9 +54,26 @@ This module is published on npm under the [`base64-encoding`](https://www.npmjs.
 The package contains the following:
 
 - The root folder ([Browse](https://unpkg.com/browse/base64-encoding/)) exports ES modules in ES2018 syntax.
-All internal module paths are fully qualified, so they can be imported in Deno or the browser directly.
+All internal module paths are fully qualified, so they can be imported in Deno or the browser directly: 
+
+  ```ts
+  import * as b64 from 'https://unpkg.com/base64-encoding?module';
+  ```
+
 - The `module` folder ([Browse](https://unpkg.com/browse/base64-encoding/module/)) contains a rolled-up version of the above.
-- The `cjs` folder ([Browse](https://unpkg.com/browse/base64-encoding/cjs/)) exports CommonJS modules in ES5 syntax.
+
+  ```ts
+  import * as b64 from 'https://unpkg.com/base64-encoding/module';
+  ```
+
+- The `cjs` folder ([Browse](https://unpkg.com/browse/base64-encoding/cjs/)) exports CommonJS modules in ES2015 syntax for use in node. 
+
+  ```ts
+  require('base64-encoding')
+  ```
+
+- The `src` folder ([Browse](https://unpkg.com/browse/base64-encoding/src/)) contains the TypeScript source code. 
+
 
 The root and `cjs` folder include type declarations and source maps, so that IntelliSense works out of the box in VSCode.
 
