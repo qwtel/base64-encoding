@@ -111,20 +111,20 @@ collections:
 # ---------------------------------------------------------------------------------------
 
 # theme:                 jekyll-theme-hydejack
-remote_theme:          hydecorp/hydejack@v9.0.4
+remote_theme:          hydecorp/hydejack@v9
 
 
 # Customizaton
 # ----------------------------------------------------------------------------------------
  
 # Sidebar image and theme color of the site.
-accent_image:          /assets/img/sidebar-bg.jpg
-accent_color:          rgb(79,177,186)
+accent_color:          '#f7df1e'
+accent_image:          'none'
 
 # This is used for the `theme-color` meta tag,
 # which changes the background color of the browser UI in certain browsers.
 # Defaults to `accent_color`.
-theme_color:           rgb(8,46,57)
+theme_color:          '#f7df1e'
 
 # The string encoding which fonts to fetch from Google Fonts.
 # See: <https://hydejack.com/docs/configuration/>
@@ -142,15 +142,10 @@ font_heading:          Roboto Slab, Helvetica, Arial, sans-serif
 font_code:             Fira Code, Menlo, Monaco, Consolas, monospace;
 
 defaults:
-  # You can use this to provide a default accent color and background for
-  # all pages under a given path:
   - scope:
-      path:            hyde/
+      path: ''
     values:
-      accent_color:    rgb(38,139,210)
-      accent_image:
-        background:    rgb(32,32,32)
-        overlay:       false
+      invert_sidebar: true
 
   # Don't include documents in assets in the sitemap
   - scope:
