@@ -173,14 +173,14 @@ export function fromByteArray(
 
   // pad the end with zeros, but make sure to not forget the extra bytes
   if (extraBytes === 1) {
-    let tmp = view.getUint8(len - 1)
+    const tmp = view.getUint8(len - 1)
     parts[j] = (
       lookup[ tmp >>  2]         +
       lookup[(tmp <<  4) & 0x3f] +
       pad + pad
     )
   } else if (extraBytes === 2) {
-    let tmp = (view.getUint8(len - 2) << 8) + view.getUint8(len - 1)
+    const tmp = (view.getUint8(len - 2) << 8) + view.getUint8(len - 1)
     parts[j] = (
       lookup[ tmp >> 10]         +
       lookup[(tmp >>  4) & 0x3f] +

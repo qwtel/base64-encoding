@@ -1,12 +1,3 @@
-node_modules
-.vscode
-play.js
-play.html
-webpack
-playground
-*.tgz
-*.log
-/base64*
-/index*
-/cjs
-/module
+/playground
+/npm
+/bench
