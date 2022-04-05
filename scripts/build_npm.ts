@@ -58,7 +58,7 @@ await build({
   packageManager: 'pnpm',
   compilerOptions: {
     sourceMap: true,
-    target: 'ES2021'
+    target: 'ES2019'
   },
   // mappings: {
   //   "https://ghuc.cc/qwtel/typed-array-utils/index.ts": {
